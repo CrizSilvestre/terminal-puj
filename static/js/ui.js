@@ -191,7 +191,7 @@ export class UI {
     const layer = $('#bubbles');
     const old = this.bubbles.get(id); if (old) { old.el.remove(); this.bubbles.delete(id); }
     if (this.bubbles.size >= 4 && kind === 'idle') return;
-    const el = document.createElement('div'); el.className = 'bub ' + kind + ' ' + (CAST[id]?.wing || '');
+    const el = document.createElement('div'); el.className = 'bub k-' + kind + ' w-' + (CAST[id]?.wing || '');
     el.innerHTML = `<b>${esc(nick(id))}</b>${esc(text)}`;
     layer.appendChild(el);
     const b = { el, until: performance.now() + ms };
