@@ -232,32 +232,47 @@ document.addEventListener('keydown', e => {
 // interacción con el lienzo
 const toWorld = e => { const b = canvas.getBoundingClientRect(); return [(e.clientX - b.left) / b.width * W, (e.clientY - b.top) / b.height * H, e.clientX - b.left, e.clientY - b.top]; };
 // --- modo juego: agarrar y soltar (mouse: arrastrar · táctil: tocar para agarrar y tocar para soltar) ---
-let press = null, touchHeld = false, chatFuel = 0;
+let press = null, touchHeld = false, chatFuel = 0, longT = null;
 async function loadChatFuel() { const cs = await load('api/chats'); if (!cs) return; const s0 = pujDayStart(); chatFuel = Object.values(cs).reduce((a, st) => a + (st.replies || []).filter(r => r[0] >= s0).reduce((b, r) => b + r[1], 0), 0); }
+// Clic en un personaje = hablar con él (tú, el CEO, hablas con Michael). En la demo pública, su ficha.
+function talkTo(id) {
+  if (PUBLIC) { ui.select(id); document.getElementById('profile').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
+  ui.select(id, true);
+  openChat(id === 'ceo' ? 'michael' : id);
+}
 canvas.addEventListener('pointerdown', e => {
   const [x, y] = toWorld(e);
-  if (touchHeld && sim.held) { sim.drop(x, y); touchHeld = false; canvas.classList.remove('grabbing'); return; }
+  if (touchHeld && sim.held) { sim.drop(x, y); touchHeld = false; canvas.classList.remove('grabbing'); press = null; return; }
   press = { x, y, cx: e.clientX, cy: e.clientY, id: sim.pick(x, y), type: e.pointerType, grabbed: false };
   if (press.type === 'mouse' && press.id) e.preventDefault();
+  // táctil: mantener presionado = agarrar
+  clearTimeout(longT);
+  if (press.type !== 'mouse' && press.id) longT = setTimeout(() => {
+    if (!press || press.grabbed) return;
+    touchHeld = sim.grab(press.id, press.x, press.y); press.grabbed = 'touch';
+    if (touchHeld) { canvas.classList.add('grabbing'); ui.bubble(press.id, 'Toca donde quieras soltarme.', 2200, 'chat'); navigator.vibrate?.(30); }
+  }, 450);
 });
 canvas.addEventListener('pointermove', e => {
   const [x, y, px, py] = toWorld(e);
+  if (press && press.type !== 'mouse' && Math.hypot(e.clientX - press.cx, e.clientY - press.cy) > 8) clearTimeout(longT); // estaba deslizando
   if (press && press.type === 'mouse' && press.id && !press.grabbed && Math.hypot(e.clientX - press.cx, e.clientY - press.cy) > 5) {
     press.grabbed = sim.grab(press.id, x, y); canvas.classList.add('grabbing'); ui.tooltip(null);
   }
-  if (sim.held && (press?.grabbed || touchHeld)) { sim.moveHeld(x, y); return; }
-  const id = sim.pick(x, y); sim.hover = id; canvas.style.cursor = id ? 'grab' : 'default';
+  if (sim.held && press?.grabbed === true) { sim.moveHeld(x, y); return; }
+  if (sim.held && touchHeld) return;
+  const id = sim.pick(x, y); sim.hover = id; canvas.style.cursor = id ? 'pointer' : 'default';
   ui.tooltip(id, px, py, null, [...flights.map.values()]);
 });
 window.addEventListener('pointerup', e => {
+  clearTimeout(longT);
   if (!press) return;
   const p = press; press = null;
-  if (p.grabbed) { const [x, y] = toWorld(e); sim.drop(x, y); canvas.classList.remove('grabbing'); return; }
+  if (p.grabbed === true) { const [x, y] = toWorld(e); sim.drop(x, y); canvas.classList.remove('grabbing'); return; }
+  if (p.grabbed === 'touch') return; // queda agarrado hasta el próximo toque
   if (e.target !== canvas) return;
-  if (p.id) {
-    if (p.type !== 'mouse') { touchHeld = sim.grab(p.id, p.x, p.y); if (touchHeld) { canvas.classList.add('grabbing'); ui.bubble(p.id, 'Toca donde quieras soltarme.', 2200, 'chat'); } return; }
-    ui.select(p.id); document.getElementById('profile').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  } else sim.poke(p.x, p.y);
+  if (p.id) { ui.tooltip(null); talkTo(p.id); }
+  else sim.poke(p.x, p.y);
 });
 canvas.addEventListener('mouseleave', () => { sim.hover = null; ui.tooltip(null); });
 extras = createExtras({ sim, ui, sky, chime, flights: () => flights, isPublic: () => PUBLIC, openChat: (id, t) => openChat(id, t, true) });

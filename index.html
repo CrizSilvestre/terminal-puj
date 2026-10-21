@@ -105,6 +105,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #tip b{display:block;font-size:13px}
 #tip span{color:#9aa1ab;display:block}
 #tip em{display:block;font-style:normal;color:#ffb000;margin-top:4px;font-family:var(--f-mono);font-size:11.5px}
+#tip i{display:block;font-style:normal;color:#f2c230;margin-top:5px;padding-top:5px;border-top:1px solid #2c3139;font-size:11.5px}
 .stagebar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 4px 2px;color:#9aa1ab;font-size:12px}
 .stagebar .btn{background:#15181d;border-color:#2a2f37;color:#d9dce1}
 .stagebar .btn:hover{border-color:#4a515c}
@@ -447,12 +448,12 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
   <div id="palette" class="palette" hidden><div class="palBox"><input id="palInput" placeholder="@dwight revisa aerointel…  o escribe un comando: junta, simulacro, dundies" autocomplete="off"><ul id="palList"></ul><div class="palHint">↑↓ para elegir · Enter para ejecutar · Esc para cerrar</div></div></div>
   <aside id="chat" class="chat" hidden aria-label="Chat con el agente">
     <div class="cHead"><canvas id="chatPic" width="12" height="20"></canvas><div><div id="chatName"></div><div id="chatRole"></div></div>
-      <button class="cX" id="chatReset" type="button" title="Empezar una conversación nueva">Nueva</button><button class="cX" id="chatClose" type="button" aria-label="Cerrar">✕</button></div>
+      <button class="cX" id="chatProfile" type="button" title="Ver su ficha">Ficha</button><button class="cX" id="chatReset" type="button" title="Empezar una conversación nueva">Nueva</button><button class="cX" id="chatClose" type="button" aria-label="Cerrar">✕</button></div>
     <div id="chatLog" aria-live="polite"></div>
     <form id="chatForm"><textarea id="chatInput" rows="2" placeholder="Escribe tu mensaje… (Enter envía, Shift+Enter salta línea)"></textarea><button class="btn primary" id="chatSend" type="submit">Enviar</button></form>
     <div class="cNote">Usa tu Claude Code de este Mac: cada mensaje gasta tokens como un encargo normal.</div>
   </aside>
-  <footer><span class="keys"><kbd>⌘K</kbd> hablar con quien sea · Arrastra a cualquiera para moverlo · clic en la máquina, el café, Anton, la pizarra, el ping-pong, la hamaca o el gato · Atajos: <kbd>S</kbd> simular · <kbd>I</kbd> simulacro · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
+  <footer><span class="keys"><kbd>⌘K</kbd> hablar con quien sea · Clic en alguien para hablarle · arrástralo para moverlo · clic en la máquina, el café, Anton, la pizarra, el ping-pong, la hamaca o el gato · Atajos: <kbd>S</kbd> simular · <kbd>I</kbd> simulacro · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
 </div>
 <script type="module" src="static/js/main.js"></script>
 </body>

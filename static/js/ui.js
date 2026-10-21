@@ -213,7 +213,7 @@ export class UI {
     if (!id) { tip.hidden = true; return; }
     const c = CAST[id], f = flights.find(fl => fl.agent === id && !fl.end);
     tip.hidden = false;
-    tip.innerHTML = `<b>${esc(c.name)}</b><span>${esc(c.role)}</span>${f ? `<em>${esc(f.no)} · ${esc(f.desc)}</em>` : ''}`;
+    tip.innerHTML = `<b>${esc(c.name)}</b><span>${esc(c.role)}</span>${f ? `<em>${esc(f.no)} · ${esc(f.desc)}</em>` : ''}<i>${id === 'ceo' ? 'Clic para darle una orden a Michael' : 'Clic para hablar'} · arrástralo para moverlo</i>`;
     tip.style.transform = `translate(${Math.round(x + 14)}px, ${Math.round(y + 10)}px)`;
   }
 
@@ -229,6 +229,7 @@ export class UI {
     const box = $('#chat'), c = CAST[id];
     box.hidden = false; box.dataset.agent = id; box.className = 'chat ' + c.wing;
     $('#chatName').textContent = id === 'michael' ? 'Michael · la Torre' : c.name;
+    $('#chatProfile').onclick = () => { this.select(id); document.getElementById('profile').scrollIntoView({ block: 'center', behavior: 'smooth' }); };
     $('#chatRole').textContent = id === 'michael' ? 'Puede delegar en el equipo' : c.role;
     const pc = $('#chatPic').getContext('2d'); pc.clearRect(0, 0, 12, 20); pc.drawImage(this.sim.chars[id].sp.portrait, 0, 0);
     this.renderChat(msgs, busy);
