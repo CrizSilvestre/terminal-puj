@@ -31,6 +31,7 @@ const STATIC = buildStatic(), PROPS = buildProps(), sky = new Sky();
 const sim = new Sim({ bubble: (id, t, ms, k) => ui.bubble(id, t, ms, k), lines: () => LINES });
 const ui = new UI(sim, () => PROFILES);
 ui.requests = () => flights.requests;
+window.__oficina = { sim, ui }; // para depurar desde la consola
 let flights = new Flights();
 
 // ---------- sonido (campanita de aeropuerto) ----------
@@ -222,12 +223,78 @@ document.addEventListener('keydown', e => {
   else if (k === 'n') namesBtn.click();
   else if (k === 'm') soundBtn.click();
   else if (k === 'c') skyBtn.click();
+  else if (k === 'i') fireBtn.click();
+  else if (k === 'escape') chatBox.hidden = true;
 });
 // interacción con el lienzo
 const toWorld = e => { const b = canvas.getBoundingClientRect(); return [(e.clientX - b.left) / b.width * W, (e.clientY - b.top) / b.height * H, e.clientX - b.left, e.clientY - b.top]; };
-canvas.addEventListener('mousemove', e => { const [x, y, px, py] = toWorld(e); const id = sim.pick(x, y); sim.hover = id; canvas.style.cursor = id ? 'pointer' : 'default'; ui.tooltip(id, px, py, null, [...flights.map.values()]); });
+// --- modo juego: agarrar y soltar (mouse: arrastrar · táctil: tocar para agarrar y tocar para soltar) ---
+let press = null, touchHeld = false;
+canvas.addEventListener('pointerdown', e => {
+  const [x, y] = toWorld(e);
+  if (touchHeld && sim.held) { sim.drop(x, y); touchHeld = false; canvas.classList.remove('grabbing'); return; }
+  press = { x, y, cx: e.clientX, cy: e.clientY, id: sim.pick(x, y), type: e.pointerType, grabbed: false };
+  if (press.type === 'mouse' && press.id) e.preventDefault();
+});
+canvas.addEventListener('pointermove', e => {
+  const [x, y, px, py] = toWorld(e);
+  if (press && press.type === 'mouse' && press.id && !press.grabbed && Math.hypot(e.clientX - press.cx, e.clientY - press.cy) > 5) {
+    press.grabbed = sim.grab(press.id, x, y); canvas.classList.add('grabbing'); ui.tooltip(null);
+  }
+  if (sim.held && (press?.grabbed || touchHeld)) { sim.moveHeld(x, y); return; }
+  const id = sim.pick(x, y); sim.hover = id; canvas.style.cursor = id ? 'grab' : 'default';
+  ui.tooltip(id, px, py, null, [...flights.map.values()]);
+});
+window.addEventListener('pointerup', e => {
+  if (!press) return;
+  const p = press; press = null;
+  if (p.grabbed) { const [x, y] = toWorld(e); sim.drop(x, y); canvas.classList.remove('grabbing'); return; }
+  if (e.target !== canvas) return;
+  if (p.id) {
+    if (p.type !== 'mouse') { touchHeld = sim.grab(p.id, p.x, p.y); if (touchHeld) { canvas.classList.add('grabbing'); ui.bubble(p.id, 'Toca donde quieras soltarme.', 2200, 'chat'); } return; }
+    ui.select(p.id); document.getElementById('profile').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  } else sim.poke(p.x, p.y);
+});
 canvas.addEventListener('mouseleave', () => { sim.hover = null; ui.tooltip(null); });
-canvas.addEventListener('click', e => { const [x, y] = toWorld(e); const id = sim.pick(x, y); if (id) { ui.select(id); document.getElementById('profile').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+// --- simulacro de incendio ---
+const fireBtn = document.getElementById('fireBtn');
+fireBtn.onclick = () => { sim.fireDrill(); chime('fail'); };
+// --- chat con los agentes ---
+const chatBox = document.getElementById('chat'), chatInput = document.getElementById('chatInput');
+async function openChat(id) {
+  if (PUBLIC) { ui.bubble(id === 'hooli' ? 'bighead' : id, 'El chat funciona en tu Mac, con la oficina abierta desde Terminal PUJ.', 3800, 'event'); return; }
+  const d = await load('api/chat?agent=' + id) || { messages: [], busy: false };
+  ui.openChat(id, d.messages || [], d.busy);
+}
+ui.onChat = openChat;
+document.getElementById('chatClose').onclick = () => { chatBox.hidden = true; };
+document.getElementById('chatReset').onclick = async () => {
+  const id = chatBox.dataset.agent;
+  await fetch('api/chat/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agent: id }) });
+  ui.renderChat([], false);
+};
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('chatForm').requestSubmit(); } });
+document.getElementById('chatForm').onsubmit = async e => {
+  e.preventDefault();
+  const id = chatBox.dataset.agent, text = chatInput.value.trim(); if (!text) return;
+  chatInput.value = '';
+  const prev = (await load('api/chat?agent=' + id))?.messages || [];
+  const pending = [...prev, { from: 'ceo', text }];
+  ui.renderChat(pending, true);
+  // en la oficina: tu memo vuela al agente y se sienta a teclear
+  sim.talking.add(id);
+  const c = sim.chars[id];
+  if (c) sim.paperPlane({ x: sim.chars.ceo.x, y: sim.chars.ceo.y - 14 }, { x: c.x, y: c.y - 14 }, null, 'memo');
+  ui.bubble('ceo', text.length > 60 ? text.slice(0, 59) + '…' : text, 3200, 'event');
+  let r;
+  try { r = await (await fetch('api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agent: id, text }) })).json(); }
+  catch { r = { error: 'No hay conexión con el servidor de la oficina.' }; }
+  sim.talking.delete(id);
+  if (r.error) { pending.push({ from: id, text: '⚠️ ' + r.error }); ui.renderChat(pending, false); return; }
+  if (c) { c.cheerT = 1; ui.bubble(id, r.reply.replace(/[*#`]/g, '').split(/(?<=[.!?])\s/)[0].slice(0, 110), 4500, 'event'); }
+  if (!chatBox.hidden && chatBox.dataset.agent === id) ui.renderChat((await load('api/chat?agent=' + id))?.messages || pending, false);
+  chime('land');
+};
 
 // ---------- reloj de cabecera ----------
 function clocks() {
@@ -245,12 +312,13 @@ function frame(nowMs) {
   const counts = {};
   for (const f of flights.active(now)) if (!f.visibleAt || f.visibleAt <= now) counts[f.agent] = (counts[f.agent] || 0) + 1;
   for (const [id, c] of Object.entries(sim.chars)) c.working = counts[id] || 0;
-  sim.michaelBusy = flights.michaelBusy(now);
+  for (const id of sim.talking) if (id === 'michael') sim.michaelChat = true;
+  sim.michaelBusy = flights.michaelBusy(now) || sim.talking.has('michael');
   sim.setHooli(counts.hooli || 0);
   sim.update(dt, t, { n });
   sky.update(dt);
   // entorno para el mobiliario
-  const working = new Set(Object.keys(counts).filter(k => counts[k] > 0));
+  const working = new Set([...Object.keys(counts).filter(k => counts[k] > 0), ...sim.talking]);
   const seated = new Set(Object.values(sim.chars).filter(c => c.sitting).map(c => c.id));
   const at = name => [...Object.values(sim.chars)].some(c => c.poi === name && !c.path);
   const glows = [];
@@ -259,13 +327,14 @@ function frame(nowMs) {
   for (const c of sim.contractors) if (c.sitting) glows.push([c.desk.x + c.desk.w / 2, c.desk.y - 1, 14, 'rgba(244,180,0,A)']);
   glows.push([268, 162, 18, 'rgba(255,90,90,A)', 0.12], [423, 78, 14, 'rgba(61,255,122,A)', 0.14], [240, 76, 14, 'rgba(125,255,176,A)', 0.14], [211, 122, 8, 'rgba(255,80,80,A)', 0.1]);
   const env = { t, n, h, working, seated, michael: sim.michaelBusy, hooliOn: sim.contractors.filter(c => c.sitting && !c.leaving).length,
-    radar: flights.active(now).map((f, i) => ((f.start * 7.13) % 1)), pingpong: at('pingA') && at('pingB'), copying: at('copier'), glows };
+    radar: flights.active(now).map((f, i) => ((f.start * 7.13) % 1)), pingpong: at('pingA') && at('pingB'), copying: at('copier'), antonFlash: sim.antonT > 0, glows };
   // --- render ---
   ctx.clearRect(0, 0, W, H);
   sky.draw(ctx, t, h);
   ctx.drawImage(STATIC, 0, 0);
   drawWallDynamic(ctx, t, h);
   sim.drawPaper(ctx, 'shadow');
+  sim.drawPuffs(ctx);
   const list = [...PROPS.map(p => ({ y: p.y, prop: p })), ...sim.drawables()].sort((a, b) => a.y - b.y);
   for (const it of list) { if (it.prop) it.prop.draw(ctx, env); else if (it.char) sim.drawChar(ctx, it.char, t); else if (it.cat) sim.drawCat(ctx, t); }
   drawLighting(ctx, env);

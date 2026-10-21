@@ -115,7 +115,7 @@ export class UI {
     this.select('michael', false);
   }
   renderCrew(snap, flightsByAgent, all = [], now = Date.now() / 1000, status = null) {
-    const label = { memo: 'enviando memo', vuelo: 'en vuelo', entrega: '¡aterrizó!', charla: 'en charla', camina: 'caminando', puesto: 'en tierra', duerme: 'zZz', pausa: 'en pausa' };
+    const label = { volando: '¡volando!', chat: 'chateando', memo: 'enviando memo', vuelo: 'en vuelo', entrega: '¡aterrizó!', charla: 'en charla', camina: 'caminando', puesto: 'en tierra', duerme: 'zZz', pausa: 'en pausa' };
     document.querySelectorAll('.crew').forEach(el => {
       const st = snap[el.dataset.id] || 'puesto', chip = el.querySelector('.chip');
       if (chip.dataset.st !== st) { chip.dataset.st = st; chip.textContent = label[st]; }
@@ -169,11 +169,13 @@ export class UI {
       <div class="pLabel">Cómo pedírselo</div>
       <ul class="pEx">${ex.map(e => `<li>${esc(e.replace(/^«|»$/g, ''))}</li>`).join('')}</ul>
       ${prof?.no_usar_para ? `<div class="pLabel">Mejor no para</div><p class="pNo">${esc(prof.no_usar_para)}</p>` : ''}
+      ${id !== 'ceo' ? `<button class="btn chatBtn" type="button" data-chat="${id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Hablar con ${esc(nick(id))}</button>` : ''}
       <div class="pStatus" id="pStatus"></div>
       <div class="pStats" id="pStats"></div>
       <div class="pLabel">Bitácora</div>
       <ul class="pLog" id="pLog"></ul>`;
     $('#profile .pPic').getContext('2d').drawImage(this.sim.chars[id].sp.portrait, 0, 0);
+    const cb = $('#profile .chatBtn'); if (cb) cb.onclick = () => this.onChat && this.onChat(id);
     this.renderProfileStatus();
   }
   renderProfileStatus(st, n) {
@@ -212,5 +214,31 @@ export class UI {
     tip.hidden = false;
     tip.innerHTML = `<b>${esc(c.name)}</b><span>${esc(c.role)}</span>${f ? `<em>${esc(f.no)} · ${esc(f.desc)}</em>` : ''}`;
     tip.style.transform = `translate(${Math.round(x + 14)}px, ${Math.round(y + 10)}px)`;
+  }
+
+  // ---------- chat con los agentes ----------
+  md(t) {
+    let h = esc(t);
+    h = h.replace(/```([\s\S]*?)```/g, (_, c) => `<pre>${c.trim()}</pre>`)
+      .replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/^#+ (.*)$/gm, '<b>$1</b>').replace(/^[-*] (.*)$/gm, '• $1');
+    return h.replace(/\n/g, '<br>');
+  }
+  openChat(id, msgs, busy) {
+    const box = $('#chat'), c = CAST[id];
+    box.hidden = false; box.dataset.agent = id; box.className = 'chat ' + c.wing;
+    $('#chatName').textContent = id === 'michael' ? 'Michael · la Torre' : c.name;
+    $('#chatRole').textContent = id === 'michael' ? 'Puede delegar en el equipo' : c.role;
+    const pc = $('#chatPic').getContext('2d'); pc.clearRect(0, 0, 12, 20); pc.drawImage(this.sim.chars[id].sp.portrait, 0, 0);
+    this.renderChat(msgs, busy);
+    setTimeout(() => $('#chatInput').focus(), 50);
+  }
+  renderChat(msgs, busy) {
+    const id = $('#chat').dataset.agent, list = $('#chatLog');
+    list.innerHTML = (msgs.length ? '' : `<div class="cEmpty">Escríbele a ${esc(nick(id))}. Lee archivos, busca y consulta, pero desde aquí no edita nada.</div>`) +
+      msgs.map(m => `<div class="cMsg ${m.from === 'ceo' ? 'me' : 'them'}">${m.from === 'ceo' ? '' : `<b>${esc(nick(m.from))}</b>`}${this.md(m.text)}${m.secs ? `<small>${m.secs} s</small>` : ''}</div>`).join('') +
+      (busy ? `<div class="cMsg them typing"><b>${esc(nick(id))}</b><span class="dots"><i></i><i></i><i></i></span></div>` : '');
+    list.scrollTop = list.scrollHeight;
+    $('#chatSend').disabled = !!busy; $('#chatInput').disabled = !!busy;
   }
 }

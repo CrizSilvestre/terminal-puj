@@ -16,6 +16,29 @@ const PAIR_SPOTS = {
 const SPOT_PAIRS = [['tableA', 'tableB'], ['pingA', 'pingB']];
 const pairKey = (a, b) => [a, b].sort().join('+');
 
+const GRAB = {
+  michael: ['¡Bájame! ¡Soy el Regional Manager!', 'Esto es acoso laboral... ¡me encanta!'],
+  dwight: ['¡Suéltame! Soy cinturón negro.', 'Pregunta: ¿quién te autorizó? Respuesta: nadie.'],
+  jim: ['Ok... esto es raro. *mira a cámara*', '¿Esto es una broma de Dwight?'],
+  pam: ['¡Cuidado con mis acuarelas!', 'Jim, ¿fuiste tú?'],
+  angela: ['¡Inaceptable! Bájame ahora.', 'Voy a reportar esto a Recursos Humanos.'],
+  oscar: ['Actually... esto viola tres normas.', 'Esto no está en el presupuesto.'],
+  kevin: ['¡Wiii! Otra vez.', '¿Me llevas a la máquina de snacks?'],
+  creed: ['He estado en sitios peores.', 'Ya me han secuestrado antes.'],
+  ryan: ['Esto es muy de startup, me gusta.', '¿Esto sale en LinkedIn?'],
+  toby: ['Perdón... ¿me puedes bajar?', 'Nadie me pregunta nunca nada.'],
+  darryl: ['Ey, ey. Tranquilo, jefe.', 'En la rampa esto no pasa.'],
+  richard: ['¡Ay, no, no, no, no!', 'Esto no escala, ¡bájame!'],
+  gilfoyle: ['Qué original.', 'Tu interfaz de arrastrar tiene latencia.'],
+  dinesh: ['¡Gilfoyle, graba esto! No, mejor no.', '¡Soy el más importante de la oficina!'],
+  jared: ['¡Qué emoción! Nunca me habían cargado.', 'Esto es como cuando era niño... en el orfanato.'],
+  erlich: ['¡Un visionario no se carga, se eleva!', 'Esta toma es perfecta para la miniatura.'],
+  monica: ['Ok, esto no estaba en la estrategia.', '¿En serio, Criz?'],
+  bighead: ['Oh... ok. Qué chévere.', '¿Ya es hora de almorzar?'],
+  ceo: ['¡Un CEO no se carga!', 'Ok, ok, que alguien me baje.'],
+};
+const DROP = ['¡Uf!', '¿Dónde estoy?', 'Ok, de aquí no me muevo.', 'Aterrizaje forzoso.', '¡Pista libre!', 'Me mareé un poco.'];
+
 class Char {
   constructor(id, look, desk, opts = {}) {
     this.id = id; this.sp = buildSprites(look, { beanbag: desk.kind === 'beanbag' }); this.desk = desk; this.seat = seatOf(desk);
@@ -38,6 +61,7 @@ export class Sim {
     this.catSp = buildCat(); this.cat = { x: 34, y: 120, tx: 34, ty: 120, t: 0, wait: 3, dir: 1 };
     this.chatT = 6; this.pairT = 18; this.michaelBusy = false; this.t = 0; this.ceoUntil = -1; this.showNames = true; this.night = 0;
     this.hooliSprites = HOOLI_LOOKS.map(l => buildSprites(l));
+    this.held = null; this.talking = new Set(); this.puffs = []; this.drill = 0;
   }
 
   // ---------- caminos ----------
@@ -127,13 +151,93 @@ export class Sim {
     }
   }
 
+  // ---------- modo juego: agarrar y soltar ----------
+  grab(id, x, y) {
+    const c = this.chars[id]; if (!c || this.held) return false;
+    if (c.busy?.pair) this.breakPair(c);
+    this.releasePoi(c); c.sitting = false; c.path = null; c.onArrive = null; c.held = true; c.anim = 'stand';
+    c.shake = 0; c.lastMv = null; this.held = c;
+    this.moveHeld(x ?? c.x, y ?? c.y);
+    const l = GRAB[id]; if (l) this.hooks.bubble(id, pick(l), 2600, 'event');
+    return true;
+  }
+  moveHeld(x, y) {
+    const c = this.held; if (!c) return;
+    if (c.lastMv) { const dx = x - c.lastMv.x; if (c.lastMv.dx && Math.sign(dx) !== Math.sign(c.lastMv.dx) && Math.abs(dx) > 2) c.shake++; c.lastMv = { x, y, dx: Math.abs(dx) > 1 ? dx : c.lastMv.dx }; }
+    else c.lastMv = { x, y, dx: 0 };
+    c.x = Math.max(6, Math.min(W - 6, x)); c.y = Math.max(28, Math.min(268, y + 12));
+  }
+  drop(x, y) {
+    const c = this.held; if (!c) return; this.held = null; c.held = false;
+    let tx = x, ty = Math.max(72, y + 12);
+    const said = (t) => this.hooks.bubble(c.id, t, 2800, 'event');
+    if (y < 60) said('¡No sé volar! Eso es para los aviones.');
+    const [cx, cy] = this.nearestFree(...this.cell(tx, ty)); tx = cx * CELL + 2; ty = GY0 + cy * CELL + 2;
+    c.x = tx; c.y = ty; c.dropT = 0.55; c.anim = 'stand'; c.dir = 'down';
+    this.puffs.push({ x: tx, y: ty, t: 0 });
+    if (c.shake >= 6) { c.dizzy = 3; said('¡Me mareo! Todo da vueltas...'); }
+    // zonas especiales
+    const near = Object.values(this.chars).find(k => k !== c && !k.held && Math.hypot(k.x - tx, k.y - ty) < 14);
+    const inR = (x0, y0, x1, y1) => tx >= x0 && tx <= x1 && ty >= y0 && ty <= y1;
+    const lines = this.hooks.lines();
+    let pairStarted = false;
+    if (near && !near.working && c.working === 0) {
+      const p = (lines?.pares || []).find(q => pairKey(q.a, q.b) === pairKey(c.id, near.id));
+      if (p) { pairStarted = true; c.dir = near.x < c.x ? 'left' : 'right'; near.dir = c.x < near.x ? 'left' : 'right';
+        let d = 600; for (const [w, t] of p.lineas) { setTimeout(() => this.hooks.bubble(w, t, 2600, 'chat'), d); d += 2800; } }
+      else setTimeout(() => this.hooks.bubble(near.id, pick(['¿Y tú qué haces aquí?', '¡Me asustaste!', 'Hola... supongo.']), 2400, 'chat'), 700);
+    }
+    if (!pairStarted && !c.dizzy && y >= 60) {
+      if (inR(204, 64, 276, 116) && c.id !== 'michael') setTimeout(() => this.hooks.bubble('michael', '¡Ey! Esta es MI torre. Fuera, fuera.', 2800, 'event'), 500);
+      else if (inR(100, 104, 190, 146) && c.id !== 'ceo') said('¿El jefe me mandó llamar?');
+      else if (inR(420, 130, 478, 170)) said('Una hamaca... esto es vida.');
+      else if (inR(286, 220, 352, 252)) said('¿Alguien dijo ping-pong?');
+      else if (inR(0, 196, 62, 270) && c.id !== 'toby') said('¿Me mandaron con Toby? ¿Qué hice?');
+      else if (inR(204, 120, 280, 190)) said(c.id === 'kevin' ? '¡Snacks!' : 'Ya que estoy, un cafecito.');
+      else if (Math.random() < 0.6) said(pick(DROP));
+    }
+    c.idleT = c.working > 0 ? 1.2 : rand(6, 12); // si tiene tarea vuelve a su puesto enseguida
+  }
+  // Clic en objetos de la oficina.
+  poke(x, y) {
+    const inR = (x0, y0, x1, y1) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+    const send = (id, poi, line) => { const c = this.chars[id]; if (!c || c.working || c.held) return; if (poi) { this.releasePoi(c); this.goPoi(c, poi); c.idleT = rand(8, 14); } if (line) this.hooks.bubble(id, line, 2600, 'chat'); };
+    if (inR(258, 150, 278, 178)) { send('kevin', 'vending', '¡Alguien tocó la máquina! ¡Voy!'); return 'vending'; }
+    if (inR(204, 116, 232, 138)) { const c = this.idleChars().filter(k => k.id !== 'michael'); if (c.length) send(pick(c).id, 'coffee', 'Café, por favor.'); return 'coffee'; }
+    if (inR(412, 62, 434, 96)) { this.antonT = 2.5; send('gilfoyle', null, 'No toques a Anton.'); return 'anton'; }
+    if (inR(438, 64, 476, 92)) { send('richard', 'whiteboard', '¡Middle-out! Déjame explicarte...'); return 'board'; }
+    if (inR(298, 224, 342, 250)) { send('gilfoyle', 'pingA'); send('dinesh', 'pingB', 'Prepárate a perder, Gilfoyle.'); return 'ping'; }
+    if (inR(430, 132, 474, 152)) { send('erlich', 'hammock', 'Mi oficina, en realidad.'); return 'hammock'; }
+    if (Math.hypot(x - this.cat.x, y - (this.cat.y - 3)) < 7) { this.hooks.bubble('angela', '¡No toques a mi gatito!', 2400, 'event'); this.cat.wait = 0; this.cat.tx = this.chars.angela.x; this.cat.ty = this.chars.angela.y + 6; return 'cat'; }
+    return null;
+  }
+  // Simulacro de incendio: todos a la puerta A1 y de vuelta.
+  fireDrill() {
+    if (this.drill > 0) return;
+    this.drill = 14;
+    const all = Object.values(this.chars);
+    all.forEach((c, i) => {
+      if (c.held) return;
+      if (c.busy?.pair) this.breakPair(c);
+      const ang = (i / all.length) * Math.PI, r = 18 + (i % 3) * 7;
+      const [cx, cy] = this.nearestFree(...this.cell(240 + Math.cos(ang) * r * 2.2, 236 + Math.sin(ang) * r * 0.6));
+      c.panic = true; this.walkTo(c, cx * CELL + 2, GY0 + cy * CELL + 2, 'down', () => { c.anim = 'stand'; c.dir = 'down'; });
+    });
+    this.hooks.bubble('dwight', '¡FUEGO! ¡Esto NO es un simulacro! ...Bueno, sí lo es.', 3600, 'event');
+    setTimeout(() => this.hooks.bubble('michael', '¡Calma! ¡Salven al CEO primero!', 3000, 'event'), 1500);
+    setTimeout(() => this.hooks.bubble('kevin', '¡Mis M&Ms!', 2500, 'event'), 3000);
+    setTimeout(() => this.hooks.bubble('jim', '*mira a cámara*', 2500, 'chat'), 5200);
+    setTimeout(() => this.hooks.bubble('toby', 'Esto lo organicé yo... nadie vino a la charla.', 3000, 'chat'), 8000);
+  }
+
   // ---------- comportamiento ----------
   idleChars() { return Object.values(this.chars).filter(c => !c.working && !c.busy && c.cheerT <= 0 && !c.path && !(c.id === 'michael' && this.michaelBusy)); }
   think(c, dt) {
-    if (c.path || c.cheerT > 0 || c.sadT > 0) return;
+    if (c.held || c.dropT > 0 || c.path || c.cheerT > 0 || c.sadT > 0) return;
+    if (this.drill > 0 && c.panic) return;
     if (c.id === 'michael' && this.michaelBusy) { if (!c.sitting) this.goSeat(c); return; }
     if (c.id === 'ceo' && this.ceoBusy()) { if (!c.sitting) this.goSeat(c); return; }
-    if (c.working > 0) {
+    if (c.working > 0 || this.talking.has(c.id)) {
       if (c.busy) this.breakPair(c);
       if (!c.sitting) this.goSeat(c);
       return;
@@ -186,18 +290,25 @@ export class Sim {
     const all = [...Object.values(this.chars), ...this.contractors];
     for (const c of all) {
       if (!c.hooli) this.think(c, dt);
+      if (c.held) { c.typeT += dt; continue; }
+      if (c.dropT > 0) c.dropT -= dt;
+      if (c.dizzy > 0) c.dizzy -= dt;
       if (c.path && c.path.length) {
-        const p = c.path[0], dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy), step = SPEED * dt;
+        const p = c.path[0], dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy), step = SPEED * (c.panic && this.drill > 0 ? 2.2 : 1) * dt;
         if (Math.abs(dx) > Math.abs(dy)) c.dir = dx > 0 ? 'right' : 'left'; else if (d > 0.01) c.dir = dy > 0 ? 'down' : 'up';
         if (d <= step) { c.x = p.x; c.y = p.y; c.path.shift(); } else { c.x += dx / d * step; c.y += dy / d * step; }
         c.ft += dt; if (c.ft > 0.13) { c.ft = 0; c.frame = (c.frame + 1) % 4; }
         if (!c.path.length) { c.path = null; c.frame = 0; c.anim = 'stand'; if (c.endDir) c.dir = c.endDir; const cb = c.onArrive; c.onArrive = null; cb && cb(); }
       }
       if (c.cheerT > 0) { c.cheerT -= dt; if (c.cheerT <= 0) c.idleT = rand(2, 6); }
+      if (c.dizzy > 0) for (let i = 0; i < 3; i++) { const a = t * 6 + i * 2.1; ctx.fillStyle = i % 2 ? '#f2c230' : '#ffffff'; ctx.fillRect(Math.round(hx + Math.cos(a) * 6), Math.round(top + 1 + Math.sin(a) * 2), 1, 1); }
       if (c.sadT > 0) { c.sadT -= dt; if (c.sadT <= 0) c.idleT = rand(2, 6); }
       c.typeT += dt;
     }
     this.contractors = this.contractors.filter(c => !c.gone);
+    if (this.drill > 0) { this.drill -= dt; if (this.drill <= 0) for (const c of Object.values(this.chars)) if (c.panic) { c.panic = false; c.idleT = rand(0.2, 2.5); if (!c.held) this.goSeat(c); } }
+    if (this.antonT > 0) this.antonT -= dt;
+    for (const p of this.puffs) p.t += dt; this.puffs = this.puffs.filter(p => p.t < 0.5);
     // aviones de papel
     for (const p of this.paper) { p.t += dt; if (p.t >= p.dur && !p.done) { p.done = true; p.cb && p.cb(); } }
     this.paper = this.paper.filter(p => p.t < p.dur + 0.3);
@@ -230,7 +341,7 @@ export class Sim {
     const sp = c.sp;
     if (c.cheerT > 0) return sp.cheer;
     if (c.sitting) {
-      const typing = c.working > 0 || (c.id === 'michael' && this.michaelBusy) || (c.id === 'ceo' && this.ceoBusy());
+      const typing = c.working > 0 || this.talking.has(c.id) || (c.id === 'michael' && this.michaelBusy) || (c.id === 'ceo' && this.ceoBusy());
       const f = typing ? Math.floor(c.typeT * 6) % 2 : 0;
       return c.seat.dir === 'up' ? sp.sitUp[f] : sp.sitDown[f];
     }
@@ -238,10 +349,17 @@ export class Sim {
     return sp[c.dir][f];
   }
   drawChar(ctx, c, t) {
+    if (c.held) { // colgando del cursor, pataleando
+      ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(Math.round(c.x) - 4, Math.round(c.y) + 1, 8, 2);
+      const img = c.sp.down[Math.floor(t * 10) % 2 ? 1 : 2];
+      ctx.save(); ctx.translate(Math.round(c.x), Math.round(c.y) - 14); ctx.rotate(Math.sin(t * 9) * 0.18); ctx.drawImage(img, -6, -12); ctx.restore();
+      c._top = c.y - 26; return;
+    }
     const img = this.spriteOf(c, t);
     let ox = Math.round(c.x) - 6, oy = Math.round(c.y) - 20;
     if (c.sitting && c.seat.dir === 'up') oy += 2;
     if (c.cheerT > 0) oy -= Math.round(Math.abs(Math.sin(c.cheerT * 9)) * 4);
+    if (c.dropT > 0) oy -= Math.round(Math.abs(Math.sin(c.dropT * 11)) * 3 * c.dropT * 2);
     if (!c.sitting) { ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fillRect(ox + 3, Math.round(c.y) - 1, 6, 2); ctx.fillRect(ox + 2, Math.round(c.y), 8, 1); }
     if (this.selected === c.id || this.hover === c.id) {
       ctx.strokeStyle = this.selected === c.id ? '#f2c230' : 'rgba(255,255,255,0.8)'; ctx.lineWidth = 1;
@@ -256,7 +374,7 @@ export class Sim {
     for (const c of all) {
       const hx = Math.round(c.x), top = c._top ?? (c.y - 20);
       // indicador de "tecleando"
-      if (c.sitting && (c.working > 0 || (c.id === 'michael' && this.michaelBusy) || (c.id === 'ceo' && this.ceoBusy()))) {
+      if (c.sitting && (c.working > 0 || this.talking.has(c.id) || (c.id === 'michael' && this.michaelBusy) || (c.id === 'ceo' && this.ceoBusy()))) {
         const bx = hx - 5, by = top - 8;
         ctx.fillStyle = '#ffffff'; ctx.fillRect(bx, by, 11, 6); ctx.fillRect(bx + 1, by - 1, 9, 1); ctx.fillRect(bx + 1, by + 6, 9, 1); ctx.fillRect(bx + 3, by + 7, 2, 1);
         const k = Math.floor(t * 3) % 4;
@@ -265,6 +383,7 @@ export class Sim {
       // dormido: Big Head en su puf o cualquiera de noche sin tarea
       const sleeping = c.sitting && !c.working && !c.hooli && c.id !== 'michael' && c.id !== 'ceo' && (c.id === 'bighead' || this.night > 0.85);
       if (sleeping) { const k = (t * 0.6 + hx * 0.01) % 1; drawText(ctx, 'Z', hx + 4 + Math.round(k * 4), Math.round(top - 2 - k * 8), `rgba(255,255,255,${1 - k})`); }
+      if (c.dizzy > 0) for (let i = 0; i < 3; i++) { const a = t * 6 + i * 2.1; ctx.fillStyle = i % 2 ? '#f2c230' : '#ffffff'; ctx.fillRect(Math.round(hx + Math.cos(a) * 6), Math.round(top + 1 + Math.sin(a) * 2), 1, 1); }
       if (c.sadT > 0) { ctx.fillStyle = '#e8453c'; ctx.fillRect(hx - 1, top - 9, 2, 4); ctx.fillRect(hx - 1, top - 4, 2, 1); }
       if (c.cheerT > 0) { for (let i = 0; i < 5; i++) { const a = i * 1.26 + t * 3, r = 7 + (1.4 - c.cheerT) * 6; ctx.fillStyle = ['#f2c230', '#78b919', '#5fd0ea', '#e8453c', '#ffffff'][i]; ctx.fillRect(Math.round(hx + Math.cos(a) * r), Math.round(top + 6 + Math.sin(a) * r * 0.6), 1, 1); } }
       // etiqueta con el nombre
@@ -275,6 +394,10 @@ export class Sim {
         drawText(ctx, name, hx - Math.floor(w / 2) + 2, ly + 1, c.id === 'ceo' ? '#f2c94c' : CAST[c.id].wing === 'pp' ? '#8ff0b5' : '#a9c8ff');
       }
     }
+  }
+  drawPuffs(ctx) {
+    for (const p of this.puffs) { const k = p.t / 0.5; ctx.fillStyle = `rgba(230,225,215,${0.8 * (1 - k)})`;
+      for (const s of [-1, 1]) { ctx.fillRect(Math.round(p.x + s * (3 + k * 7)), Math.round(p.y - 1 - k * 2), 2, 1); ctx.fillRect(Math.round(p.x + s * (2 + k * 4)), Math.round(p.y - k * 3), 1, 1); } }
   }
   drawPaper(ctx, phase) {
     for (const p of this.paper) {
@@ -295,7 +418,7 @@ export class Sim {
   }
   drawables() {
     const list = [];
-    for (const c of [...Object.values(this.chars), ...this.contractors]) list.push({ y: c.y + (c.sitting ? 0.6 : 0.4), char: c });
+    for (const c of [...Object.values(this.chars), ...this.contractors]) list.push({ y: c.held ? 9999 : c.y + (c.sitting ? 0.6 : 0.4), char: c });
     list.push({ y: this.cat.y, cat: true });
     return list;
   }
@@ -318,7 +441,7 @@ export class Sim {
   snapshot() {
     const out = {};
     for (const [id, c] of Object.entries(this.chars)) {
-      out[id] = id === 'ceo' && this.ceoBusy() ? 'memo' : c.cheerT > 0 ? 'entrega' : c.working > 0 ? 'vuelo' : (id === 'michael' && this.michaelBusy) ? 'vuelo' : c.busy ? 'charla' : c.path ? 'camina' : c.sitting ? (c.id === 'bighead' || this.night > 0.85 ? 'duerme' : 'puesto') : 'pausa';
+      out[id] = c.held ? 'volando' : this.talking.has(id) ? 'chat' : id === 'ceo' && this.ceoBusy() ? 'memo' : c.cheerT > 0 ? 'entrega' : c.working > 0 ? 'vuelo' : (id === 'michael' && this.michaelBusy) ? 'vuelo' : c.busy ? 'charla' : c.path ? 'camina' : c.sitting ? (c.id === 'bighead' || this.night > 0.85 ? 'duerme' : 'puesto') : 'pausa';
     }
     return out;
   }

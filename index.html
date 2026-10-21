@@ -235,6 +235,32 @@ button{font:inherit;color:inherit;cursor:pointer}
 footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
 kbd{font:600 11px var(--f-mono);background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px}
 .keys{display:inline-block;margin-bottom:6px}
+.chatBtn{margin-top:12px;width:100%;justify-content:center;background:var(--ink);color:var(--panel);border-color:transparent}
+.chatBtn:hover{opacity:.9}
+.chat{position:fixed;right:16px;bottom:16px;width:min(420px,calc(100vw - 32px));height:min(620px,calc(100vh - 32px));background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -12px rgba(0,0,0,.45);display:flex;flex-direction:column;z-index:50;overflow:hidden}
+.cHead{display:flex;gap:10px;align-items:center;padding:10px 12px;color:#fff;background:linear-gradient(135deg,#1d3e6e,#2c5a96)}
+.chat.pp .cHead{background:linear-gradient(135deg,#1f6e40,#2fa35f)}
+.cHead canvas{width:30px;height:50px;image-rendering:pixelated;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 6px;box-sizing:content-box}
+#chatName{font-weight:700} #chatRole{font-size:12px;opacity:.85}
+.cX{margin-left:auto;background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:8px;padding:5px 9px;font-size:12.5px;font-weight:600}
+.cX + .cX{margin-left:6px}
+#chatLog{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.cMsg{max-width:88%;padding:8px 11px;border-radius:12px;font-size:13.5px;line-height:1.45;word-wrap:break-word}
+.cMsg.me{align-self:flex-end;background:#1d3e6e;color:#fff;border-bottom-right-radius:4px}
+.cMsg.them{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:4px}
+.cMsg b:first-child{display:block;font:700 10.5px var(--f-sign);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.cMsg small{display:block;margin-top:3px;font:600 10.5px var(--f-mono);color:var(--muted)}
+.cMsg pre{white-space:pre-wrap;background:var(--panel2);padding:6px 8px;border-radius:6px;font:12px var(--f-mono);margin:4px 0}
+.cMsg code{font:12px var(--f-mono);background:var(--panel2);padding:0 4px;border-radius:4px}
+.cEmpty{color:var(--muted);text-align:center;font-size:13px;margin:auto 10px}
+.dots{display:inline-flex;gap:4px;padding:4px 0}.dots i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes dot{50%{opacity:.25;transform:translateY(-2px)}}
+#chatForm{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+#chatInput{flex:1;resize:none;font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel);color:var(--ink)}
+#chatInput:focus{outline:2px solid var(--sign);outline-offset:0}
+.cNote{font-size:11px;color:var(--muted);padding:0 12px 10px}
+#stage.grabbing{cursor:grabbing!important}
 footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
 @media (max-width:620px){
   .wrap{padding:14px 16px 24px}
@@ -294,6 +320,7 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
         <span class="skylbl" id="skyLabel">Día</span>
         <button class="btn" id="skyBtn" type="button" aria-pressed="false" title="Cielo real de Punta Cana o un día completo en 60 s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a6 6 0 1 0 9 9 9 9 0 1 1-9-9z"/></svg><span>Cielo real</span></button>
         <button class="btn" id="namesBtn" type="button" aria-pressed="true" title="Nombres sobre quien trabaja"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/></svg>Nombres</button>
+        <button class="btn" id="fireBtn" type="button" title="Simulacro de incendio (I)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22c4 0 7-3 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-3 3-5 5-5 8 0 4 3 7 7 7z"/></svg>Simulacro</button>
         <button class="btn" id="tvBtn" type="button" title="Modo TV: la terminal a pantalla completa (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>TV</button>
         <button class="btn" id="soundBtn" type="button" aria-pressed="false" title="Campanita de aeropuerto al aterrizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span>Silencio</span></button>
         <div class="legend"><span><i style="background:#1d3e6e"></i>Dunder Mifflin</span><span><i style="background:#2a8f53"></i>Pied Piper</span><span><i style="background:#e8453c"></i>Hooli · Antigravity</span><span><i style="background:#c9a227"></i>memo del CEO</span><span><i style="background:#fff"></i>avión de papel = tarea</span></div>
@@ -336,7 +363,14 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
     </section>
   </div>
 
-  <footer><span class="keys">Atajos: <kbd>S</kbd> simular · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
+  <aside id="chat" class="chat" hidden aria-label="Chat con el agente">
+    <div class="cHead"><canvas id="chatPic" width="12" height="20"></canvas><div><div id="chatName"></div><div id="chatRole"></div></div>
+      <button class="cX" id="chatReset" type="button" title="Empezar una conversación nueva">Nueva</button><button class="cX" id="chatClose" type="button" aria-label="Cerrar">✕</button></div>
+    <div id="chatLog" aria-live="polite"></div>
+    <form id="chatForm"><textarea id="chatInput" rows="2" placeholder="Escribe tu mensaje… (Enter envía, Shift+Enter salta línea)"></textarea><button class="btn primary" id="chatSend" type="submit">Enviar</button></form>
+    <div class="cNote">Usa tu Claude Code de este Mac: cada mensaje gasta tokens como un encargo normal.</div>
+  </aside>
+  <footer><span class="keys">Arrastra a cualquiera para moverlo · clic en la máquina, el café, Anton, la pizarra, el ping-pong, la hamaca o el gato · Atajos: <kbd>S</kbd> simular · <kbd>I</kbd> simulacro · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
 </div>
 <script type="module" src="static/js/main.js"></script>
 </body>

@@ -481,7 +481,7 @@ export function buildProps() {
   // --- Pied Piper ---
   props.push({ y: 94, draw(ctx, env) { // Anton
     R(ctx, 414, 62, 18, 32, '#15171b'); R(ctx, 414, 62, 18, 1, '#2a2e35');
-    for (let r = 0; r < 7; r++) { R(ctx, 416, 65 + r * 4, 14, 3, '#22252b'); for (let i = 0; i < 4; i++) { const on = noise(r * 9 + i, Math.floor(env.t * (2 + (r % 3)))) > 0.45; P(ctx, 418 + i * 3, 66 + r * 4, on ? (i === 3 ? '#f5a623' : '#3dff7a') : '#1f4d2c'); } }
+    for (let r = 0; r < 7; r++) { R(ctx, 416, 65 + r * 4, 14, 3, '#22252b'); for (let i = 0; i < 4; i++) { const on = env.antonFlash ? Math.floor(env.t * 12 + r + i) % 2 === 0 : noise(r * 9 + i, Math.floor(env.t * (2 + (r % 3)))) > 0.45; P(ctx, 418 + i * 3, 66 + r * 4, on ? (i === 3 ? '#f5a623' : '#3dff7a') : '#1f4d2c'); } }
     drawText(ctx, 'ANTON', 413, 95, '#7d838c');
   } });
   props.push({ y: 92, draw(ctx, env) { // pizarra middle-out
