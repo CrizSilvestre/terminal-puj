@@ -1,7 +1,8 @@
-import { W, H, CAST, Flights, pujHour, pick, fmtTime, nick } from './data.js';
+import { W, H, CAST, Flights, pujHour, pujDayStart, pick, fmtTime, nick } from './data.js';
 import { buildStatic, buildProps, Sky, drawWallDynamic, drawLighting, nightness } from './world.js';
 import { Sim } from './sim.js';
 import { UI } from './ui.js';
+import { createExtras } from './extras.js';
 
 // ---------- contenido (diálogos y radio de Antigravity, con respaldo) ----------
 let LINES = null, RADIO = null, PROFILES = null;
@@ -28,10 +29,11 @@ function fit() {
 new ResizeObserver(fit).observe(wrap);
 
 const STATIC = buildStatic(), PROPS = buildProps(), sky = new Sky();
-const sim = new Sim({ bubble: (id, t, ms, k) => ui.bubble(id, t, ms, k), lines: () => LINES });
+let extras = null;
+const sim = new Sim({ bubble: (id, t, ms, k) => ui.bubble(id, t, ms, k), lines: () => LINES, game: (n, d) => extras && extras.game(n, d) });
 const ui = new UI(sim, () => PROFILES);
 ui.requests = () => flights.requests;
-window.__oficina = { sim, ui }; // para depurar desde la consola
+window.__oficina = { sim, ui, sky }; // para depurar desde la consola
 let flights = new Flights();
 
 // ---------- sonido (campanita de aeropuerto) ----------
@@ -63,6 +65,7 @@ const agentName = f => nick(f.agent);
 // ---------- acciones (eventos → animación) ----------
 function act(a, silent) {
   if (!a) return;
+  if (!silent && extras) extras.onAct(a);
   const now = Date.now() / 1000;
   if (a.type === 'request') {
     if (silent) return;
@@ -229,7 +232,8 @@ document.addEventListener('keydown', e => {
 // interacción con el lienzo
 const toWorld = e => { const b = canvas.getBoundingClientRect(); return [(e.clientX - b.left) / b.width * W, (e.clientY - b.top) / b.height * H, e.clientX - b.left, e.clientY - b.top]; };
 // --- modo juego: agarrar y soltar (mouse: arrastrar · táctil: tocar para agarrar y tocar para soltar) ---
-let press = null, touchHeld = false;
+let press = null, touchHeld = false, chatFuel = 0;
+async function loadChatFuel() { const cs = await load('api/chats'); if (!cs) return; const s0 = pujDayStart(); chatFuel = Object.values(cs).reduce((a, st) => a + (st.replies || []).filter(r => r[0] >= s0).reduce((b, r) => b + r[1], 0), 0); }
 canvas.addEventListener('pointerdown', e => {
   const [x, y] = toWorld(e);
   if (touchHeld && sim.held) { sim.drop(x, y); touchHeld = false; canvas.classList.remove('grabbing'); return; }
@@ -256,17 +260,20 @@ window.addEventListener('pointerup', e => {
   } else sim.poke(p.x, p.y);
 });
 canvas.addEventListener('mouseleave', () => { sim.hover = null; ui.tooltip(null); });
+extras = createExtras({ sim, ui, sky, chime, flights: () => flights, isPublic: () => PUBLIC, openChat: (id, t) => openChat(id, t, true) });
 // --- simulacro de incendio ---
 const fireBtn = document.getElementById('fireBtn');
-fireBtn.onclick = () => { sim.fireDrill(); chime('fail'); };
+fireBtn.onclick = () => { if (sim.drill > 0) return; sim.fireDrill(); chime('fail'); extras?.onAct({ type: 'drill' }); };
 // --- chat con los agentes ---
 const chatBox = document.getElementById('chat'), chatInput = document.getElementById('chatInput');
-async function openChat(id) {
+async function openChat(id, text, send = true) {
   if (PUBLIC) { ui.bubble(id === 'hooli' ? 'bighead' : id, 'El chat funciona en tu Mac, con la oficina abierta desde Terminal PUJ.', 3800, 'event'); return; }
   const d = await load('api/chat?agent=' + id) || { messages: [], busy: false };
   ui.openChat(id, d.messages || [], d.busy);
+  if (text) { chatInput.value = text; if (send && !d.busy) document.getElementById('chatForm').requestSubmit(); }
 }
-ui.onChat = openChat;
+ui.onChat = id => openChat(id);
+ui.onExample = (id, text) => openChat(id, text, false);
 document.getElementById('chatClose').onclick = () => { chatBox.hidden = true; };
 document.getElementById('chatReset').onclick = async () => {
   const id = chatBox.dataset.agent;
@@ -290,6 +297,7 @@ document.getElementById('chatForm').onsubmit = async e => {
   try { r = await (await fetch('api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agent: id, text }) })).json(); }
   catch { r = { error: 'No hay conexión con el servidor de la oficina.' }; }
   sim.talking.delete(id);
+  if (r.tokens) chatFuel += r.tokens;
   if (r.error) { pending.push({ from: id, text: '⚠️ ' + r.error }); ui.renderChat(pending, false); return; }
   if (c) { c.cheerT = 1; ui.bubble(id, r.reply.replace(/[*#`]/g, '').split(/(?<=[.!?])\s/)[0].slice(0, 110), 4500, 'event'); }
   if (!chatBox.hidden && chatBox.dataset.agent === id) ui.renderChat((await load('api/chat?agent=' + id))?.messages || pending, false);
@@ -346,10 +354,10 @@ function frame(nowMs) {
   if (slow <= 0) {
     slow = 1;
     ui.renderBoard(flights.board(now), (f, nn) => flights.status(f, nn), now);
-    ui.renderStats(flights.stats(now));
+    { const st = flights.stats(now); st.fuel += PUBLIC ? 0 : chatFuel; ui.renderStats(st); }
     const byAgent = {}; for (const f of flights.active(now)) byAgent[f.agent] = (byAgent[f.agent] || 0) + 1;
     ui.renderCrew(sim.snapshot(), byAgent, [...flights.map.values()], now, (f, nn) => flights.status(f, nn));
-    for (const f of flights.active(now)) if (now - f.start > 900 && !f.delayedNoted) { f.delayedNoted = true; if (!initial) say('demorado', { vuelo: f.no, destino: f.dest.name, agente: agentName(f), min: Math.round((now - f.start) / 60), desc: trim(f.desc, 50) }); }
+    for (const f of flights.active(now)) if (now - f.start > 900 && !f.delayedNoted) { f.delayedNoted = true; if (!initial) { const min = Math.round((now - f.start) / 60); say('demorado', { vuelo: f.no, destino: f.dest.name, agente: agentName(f), min, desc: trim(f.desc, 50) }); extras?.onAct({ type: 'delay', flight: f, min }); } }
     clocks();
     document.getElementById('skyLabel').textContent = h >= 5.5 && h < 7.5 ? 'Amanecer' : h >= 7.5 && h < 17 ? 'Día' : h >= 17 && h < 19.5 ? 'Atardecer' : 'Noche';
   }
@@ -365,7 +373,7 @@ function frame(nowMs) {
     LINES.idle.ceo = ['¿Cómo va la OTP de hoy?', 'Quiero ese parser listo antes del vuelo de las 6.', 'Buen trabajo, equipo. Sigan así.', 'Michael, ¿quién está en vuelo?', 'Esta oficina ya parece una aerolínea.', 'Revisen todo antes del push, por favor.'];
     LINES.trabajando = LINES.trabajando || {}; LINES.trabajando.ceo = ['Firmando el memo para la Torre.'];
   }
-  await poll(); await pollAgy();
+  await poll(); await pollAgy(); loadChatFuel(); setInterval(loadChatFuel, 60000);
   if (!liveOk) { PUBLIC = true; document.getElementById('demoBtn').hidden = true; document.getElementById('agyState').textContent = 'Demo: la versión en vivo corre en tu Mac'; runDemo(); }
   setInterval(poll, 1500); setInterval(pollAgy, 5000);
   requestAnimationFrame(frame);

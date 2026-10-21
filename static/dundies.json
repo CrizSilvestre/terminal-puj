@@ -1,0 +1,134 @@
+{
+  "mas_vuelos": {
+    "premios": [
+      "El Dundie a la Bestia de Carga Terminal",
+      "Premio Turbina Incansable del Hangar",
+      "Dundie al Vuelo Sin Escalas Ni Descanso"
+    ],
+    "discurso": [
+      "Si la pista no descansa, {agente} tampoco, ¡un verdadero titán del teclado!",
+      "Nadie sabe de dónde saca energía {agente}, pero gracias a Dios no cobra horas extra."
+    ]
+  },
+  "mejor_otp": {
+    "premios": [
+      "El Dundie Reloj Suizo del Caribe",
+      "Premio Puntualidad de Relojería Fina",
+      "Dundie al Rayo que Nunca Aterriza Tarde"
+    ],
+    "discurso": [
+      "{agente} hace que un vuelo de quince minutos parezca una eternidad de pura precisión.",
+      "La puntualidad es respeto, y {agente} nos respeta más que el mismísimo cronómetro."
+    ]
+  },
+  "mas_rapido": {
+    "premios": [
+      "El Dundie Supersónico sin Frenos",
+      "Premio Clic Más Veloz del Caribe",
+      "Dundie Meteoro de Punta Cana"
+    ],
+    "discurso": [
+      "Parpadeas y {agente} ya cerró tres tareas pendientes... ¡me da hasta vértigo!",
+      "La velocidad no lo es todo en la vida, pero en {agente} es una obra de arte moderna."
+    ]
+  },
+  "mas_lento": {
+    "premios": [
+      "El Dundie al Ritmo Zen de Oficina",
+      "Premio Cocción Lenta de Procesos",
+      "Dundie a la Filosofía Sin Prisas"
+    ],
+    "discurso": [
+      "Las obras maestras tardan su tiempo, y {agente} las cocina a fuego muy lento.",
+      "{agente} no procrastina, simplemente saborea cada byte de la experiencia laboral."
+    ]
+  },
+  "mas_cancelados": {
+    "premios": [
+      "El Dundie al Desvío Inesperado de Ruta",
+      "Premio al Aterrizaje Forzoso con Estilo",
+      "Dundie a la Resiliencia Ante el Error"
+    ],
+    "discurso": [
+      "Caerse siete veces y reiniciar ocho, eso define el espíritu audaz de {agente}.",
+      "Un error es solo una oportunidad para que {agente} vuelva a sorprendernos a todos."
+    ]
+  },
+  "mas_combustible": {
+    "premios": [
+      "El Dundie al Motor Traga-Tokens",
+      "Premio Tanque Lleno de Pura Inspiración",
+      "Dundie al Consumo VIP Ilimitado"
+    ],
+    "discurso": [
+      "Quien gasta tanto como {agente} es porque piensa en grande y en oraciones kilométricas.",
+      "Gastamos una fortuna en combustible digital, pero la elocuencia de {agente} lo vale."
+    ]
+  },
+  "mas_eficiente": {
+    "premios": [
+      "El Dundie al Minimalismo Binario",
+      "Premio Menos Palabras, Más Vuelos",
+      "Dundie al Ahorro Magistral de Energía"
+    ],
+    "discurso": [
+      "Dijo mi héroe: lo bueno, si breve, dos veces bueno, y {agente} lo llevó al extremo.",
+      "Con solo tres palabras y un comando, {agente} soluciona lo que a mí me toma una semana."
+    ]
+  },
+  "mas_charlas": {
+    "premios": [
+      "El Dundie al Radioaficionado Oficial",
+      "Premio Mejor Oyente de Mis Discursos",
+      "Dundie a la Charla de Pasillo Digital"
+    ],
+    "discurso": [
+      "Amo hablar con mi equipo, y {agente} es quien mejor finge interesarse en mis anécdotas.",
+      "Siempre hay tiempo para un cafecito y un mensaje, ¿verdad, mi querido {agente}?"
+    ]
+  },
+  "madrugador": {
+    "premios": [
+      "El Dundie al Canto del Gallo Dominicano",
+      "Premio Primer Café Frente a la Pista",
+      "Dundie al Sol Naciente de la Terminal"
+    ],
+    "discurso": [
+      "A esa hora ni los pájaros cantan, pero {agente} ya estaba procesando vuelos en la pista.",
+      "El éxito llega a los que madrugan, y {agente} claramente quiere mi puesto de trabajo."
+    ]
+  },
+  "noctambulo": {
+    "premios": [
+      "El Dundie al Guardián de la Torre Oscura",
+      "Premio Turno Vampírico de la Terminal",
+      "Dundie al Búho Sabio del Hangar B"
+    ],
+    "discurso": [
+      "Cuando la pista duerme, {agente} sigue vigilando nuestros sueños y nuestro ancho de banda.",
+      "La noche confunde, pero a {agente} le aclara las ideas de una manera muy sospechosa."
+    ]
+  },
+  "mas_arrastrado": {
+    "premios": [
+      "El Dundie al Muñeco de Trapo Ejecutivo",
+      "Premio Pieza de Ajedrez Favorita",
+      "Dundie al Agente Más Paseado en Pista"
+    ],
+    "discurso": [
+      "Si te arrastro de aquí para allá, {agente}, es únicamente por puro liderazgo táctico.",
+      "Un buen jefe mueve a su gente, y a {agente} lo moví literalmente por toda la pantalla."
+    ]
+  },
+  "misterio": {
+    "premios": [
+      "El Dundie al Enigma Sin Identificación",
+      "Premio Fantasma de las Turbinas",
+      "Dundie al Agente Incógnito del Año"
+    ],
+    "discurso": [
+      "Nadie sabe qué hace {agente}, pero si no estuviera aquí, la oficina colapsaría en segundos.",
+      "No preguntes por los papeles de {agente}, solo dale un fuerte aplauso y no lo mires fijo."
+    ]
+  }
+}

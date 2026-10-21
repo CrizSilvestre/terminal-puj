@@ -76,7 +76,7 @@ export class UI {
     set('#stFlights', s.flights);
     set('#stAir', s.airborne);
     set('#stBlock', s.block ? (s.block < 60 ? Math.round(s.block) + 's' : Math.round(s.block / 60) + 'm') : '—');
-    set('#stReq', s.requests);
+    set('#stFuel', s.fuel >= 1e6 ? (s.fuel / 1e6).toFixed(1).replace('.', ',') + 'M' : s.fuel >= 1e3 ? Math.round(s.fuel / 1e3) + 'k' : String(s.fuel || 0));
     $('#otpBar').style.width = (s.otp ?? 0) + '%';
     $('#otpBar').className = 'otpbar ' + (s.otp == null ? '' : s.otp >= 85 ? 'good' : s.otp >= 70 ? 'mid' : 'bad');
   }
@@ -167,7 +167,7 @@ export class UI {
       </div>
       <p class="pBlurb">${esc(prof?.especialidad ? prof.especialidad + '.' : c.blurb)}</p>
       <div class="pLabel">Cómo pedírselo</div>
-      <ul class="pEx">${ex.map(e => `<li>${esc(e.replace(/^«|»$/g, ''))}</li>`).join('')}</ul>
+      <ul class="pEx">${ex.map(e => `<li${id !== 'ceo' ? ' class="ask" tabindex="0" title="Escribírselo en el chat"' : ''}>${esc(e.replace(/^«|»$/g, ''))}</li>`).join('')}</ul>
       ${prof?.no_usar_para ? `<div class="pLabel">Mejor no para</div><p class="pNo">${esc(prof.no_usar_para)}</p>` : ''}
       ${id !== 'ceo' ? `<button class="btn chatBtn" type="button" data-chat="${id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Hablar con ${esc(nick(id))}</button>` : ''}
       <div class="pStatus" id="pStatus"></div>
@@ -176,6 +176,7 @@ export class UI {
       <ul class="pLog" id="pLog"></ul>`;
     $('#profile .pPic').getContext('2d').drawImage(this.sim.chars[id].sp.portrait, 0, 0);
     const cb = $('#profile .chatBtn'); if (cb) cb.onclick = () => this.onChat && this.onChat(id);
+    document.querySelectorAll('#profile .pEx li.ask').forEach(li => { const go = () => this.onExample && this.onExample(id, li.textContent); li.onclick = go; li.onkeydown = e => { if (e.key === 'Enter') go(); }; });
     this.renderProfileStatus();
   }
   renderProfileStatus(st, n) {
@@ -236,7 +237,7 @@ export class UI {
   renderChat(msgs, busy) {
     const id = $('#chat').dataset.agent, list = $('#chatLog');
     list.innerHTML = (msgs.length ? '' : `<div class="cEmpty">Escríbele a ${esc(nick(id))}. Lee archivos, busca y consulta, pero desde aquí no edita nada.</div>`) +
-      msgs.map(m => `<div class="cMsg ${m.from === 'ceo' ? 'me' : 'them'}">${m.from === 'ceo' ? '' : `<b>${esc(nick(m.from))}</b>`}${this.md(m.text)}${m.secs ? `<small>${m.secs} s</small>` : ''}</div>`).join('') +
+      msgs.map(m => `<div class="cMsg ${m.from === 'ceo' ? 'me' : 'them'}">${m.from === 'ceo' ? '' : `<b>${esc(nick(m.from))}</b>`}${this.md(m.text)}${m.secs ? `<small>${m.secs} s${m.tokens ? ' · ' + (m.tokens >= 1000 ? Math.round(m.tokens / 1000) + ' k' : m.tokens) + ' tokens' : ''}</small>` : ''}</div>`).join('') +
       (busy ? `<div class="cMsg them typing"><b>${esc(nick(id))}</b><span class="dots"><i></i><i></i><i></i></span></div>` : '');
     list.scrollTop = list.scrollHeight;
     $('#chatSend').disabled = !!busy; $('#chatInput').disabled = !!busy;

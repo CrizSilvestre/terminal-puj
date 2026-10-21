@@ -159,6 +159,7 @@ export class Sim {
     c.shake = 0; c.lastMv = null; this.held = c;
     this.moveHeld(x ?? c.x, y ?? c.y);
     const l = GRAB[id]; if (l) this.hooks.bubble(id, pick(l), 2600, 'event');
+    this.game('grab', id);
     return true;
   }
   moveHeld(x, y) {
@@ -175,7 +176,8 @@ export class Sim {
     const [cx, cy] = this.nearestFree(...this.cell(tx, ty)); tx = cx * CELL + 2; ty = GY0 + cy * CELL + 2;
     c.x = tx; c.y = ty; c.dropT = 0.55; c.anim = 'stand'; c.dir = 'down';
     this.puffs.push({ x: tx, y: ty, t: 0 });
-    if (c.shake >= 6) { c.dizzy = 3; said('¡Me mareo! Todo da vueltas...'); }
+    if (c.shake >= 6) { c.dizzy = 3; said('¡Me mareo! Todo da vueltas...'); this.game('mareo', c.id); }
+    this.game('drop', c.id);
     // zonas especiales
     const near = Object.values(this.chars).find(k => k !== c && !k.held && Math.hypot(k.x - tx, k.y - ty) < 14);
     const inR = (x0, y0, x1, y1) => tx >= x0 && tx <= x1 && ty >= y0 && ty <= y1;
@@ -183,14 +185,14 @@ export class Sim {
     let pairStarted = false;
     if (near && !near.working && c.working === 0) {
       const p = (lines?.pares || []).find(q => pairKey(q.a, q.b) === pairKey(c.id, near.id));
-      if (p) { pairStarted = true; c.dir = near.x < c.x ? 'left' : 'right'; near.dir = c.x < near.x ? 'left' : 'right';
+      if (p) { pairStarted = true; this.game('pareja', pairKey(c.id, near.id)); c.dir = near.x < c.x ? 'left' : 'right'; near.dir = c.x < near.x ? 'left' : 'right';
         let d = 600; for (const [w, t] of p.lineas) { setTimeout(() => this.hooks.bubble(w, t, 2600, 'chat'), d); d += 2800; } }
       else setTimeout(() => this.hooks.bubble(near.id, pick(['¿Y tú qué haces aquí?', '¡Me asustaste!', 'Hola... supongo.']), 2400, 'chat'), 700);
     }
     if (!pairStarted && !c.dizzy && y >= 60) {
-      if (inR(204, 64, 276, 116) && c.id !== 'michael') setTimeout(() => this.hooks.bubble('michael', '¡Ey! Esta es MI torre. Fuera, fuera.', 2800, 'event'), 500);
+      if (inR(204, 64, 276, 116) && c.id !== 'michael') this.game('torre', c.id), setTimeout(() => this.hooks.bubble('michael', '¡Ey! Esta es MI torre. Fuera, fuera.', 2800, 'event'), 500);
       else if (inR(100, 104, 190, 146) && c.id !== 'ceo') said('¿El jefe me mandó llamar?');
-      else if (inR(420, 130, 478, 170)) said('Una hamaca... esto es vida.');
+      else if (inR(420, 130, 478, 170)) { said('Una hamaca... esto es vida.'); this.game('hamaca', c.id); }
       else if (inR(286, 220, 352, 252)) said('¿Alguien dijo ping-pong?');
       else if (inR(0, 196, 62, 270) && c.id !== 'toby') said('¿Me mandaron con Toby? ¿Qué hice?');
       else if (inR(204, 120, 280, 190)) said(c.id === 'kevin' ? '¡Snacks!' : 'Ya que estoy, un cafecito.');
@@ -198,8 +200,12 @@ export class Sim {
     }
     c.idleT = c.working > 0 ? 1.2 : rand(6, 12); // si tiene tarea vuelve a su puesto enseguida
   }
+  game(name, data) { try { this.hooks.game && this.hooks.game(name, data); } catch {} }
   // Clic en objetos de la oficina.
   poke(x, y) {
+    const r = this._poke(x, y); if (r) this.game('poke', r); return r;
+  }
+  _poke(x, y) {
     const inR = (x0, y0, x1, y1) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
     const send = (id, poi, line) => { const c = this.chars[id]; if (!c || c.working || c.held) return; if (poi) { this.releasePoi(c); this.goPoi(c, poi); c.idleT = rand(8, 14); } if (line) this.hooks.bubble(id, line, 2600, 'chat'); };
     if (inR(258, 150, 278, 178)) { send('kevin', 'vending', '¡Alguien tocó la máquina! ¡Voy!'); return 'vending'; }
@@ -211,23 +217,37 @@ export class Sim {
     if (Math.hypot(x - this.cat.x, y - (this.cat.y - 3)) < 7) { this.hooks.bubble('angela', '¡No toques a mi gatito!', 2400, 'event'); this.cat.wait = 0; this.cat.tx = this.chars.angela.x; this.cat.ty = this.chars.angela.y + 6; return 'cat'; }
     return null;
   }
+  // Reunir a todo el equipo alrededor de un punto (simulacro, junta) y devolverlos luego.
+  assemble(cx, cy, rx, ry, secs, fast) {
+    this.drill = secs; this.drillFast = fast;
+    const all = Object.values(this.chars).filter(c => !c.held);
+    all.forEach((c, i) => {
+      if (c.busy?.pair) this.breakPair(c);
+      const ang = (i / all.length) * Math.PI * 2, [px, py] = this.nearestFree(...this.cell(cx + Math.cos(ang) * rx, cy + Math.sin(ang) * ry));
+      const tx = px * CELL + 2, ty = GY0 + py * CELL + 2;
+      c.panic = true;
+      this.walkTo(c, tx, ty, 'down', () => { c.anim = 'stand'; const dx = cx - c.x, dy = cy - c.y; c.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'); });
+    });
+  }
   // Simulacro de incendio: todos a la puerta A1 y de vuelta.
   fireDrill() {
     if (this.drill > 0) return;
-    this.drill = 14;
-    const all = Object.values(this.chars);
-    all.forEach((c, i) => {
-      if (c.held) return;
-      if (c.busy?.pair) this.breakPair(c);
-      const ang = (i / all.length) * Math.PI, r = 18 + (i % 3) * 7;
-      const [cx, cy] = this.nearestFree(...this.cell(240 + Math.cos(ang) * r * 2.2, 236 + Math.sin(ang) * r * 0.6));
-      c.panic = true; this.walkTo(c, cx * CELL + 2, GY0 + cy * CELL + 2, 'down', () => { c.anim = 'stand'; c.dir = 'down'; });
-    });
+    this.assemble(240, 238, 46, 16, 14, true);
     this.hooks.bubble('dwight', '¡FUEGO! ¡Esto NO es un simulacro! ...Bueno, sí lo es.', 3600, 'event');
     setTimeout(() => this.hooks.bubble('michael', '¡Calma! ¡Salven al CEO primero!', 3000, 'event'), 1500);
     setTimeout(() => this.hooks.bubble('kevin', '¡Mis M&Ms!', 2500, 'event'), 3000);
     setTimeout(() => this.hooks.bubble('jim', '*mira a cámara*', 2500, 'chat'), 5200);
     setTimeout(() => this.hooks.bubble('toby', 'Esto lo organicé yo... nadie vino a la charla.', 3000, 'chat'), 8000);
+    setTimeout(() => this.game('simulacro'), 13000);
+  }
+  // Junta del equipo en la zona del café: Michael lee el parte del día (sin gastar tokens).
+  meeting(lines) {
+    if (this.drill > 0) return false;
+    this.assemble(240, 168, 34, 22, 6 + lines.length * 3.2, false);
+    let d = 4500;
+    for (const l of lines) { setTimeout(() => this.hooks.bubble('michael', l, 3000, 'event'), d); d += 3200; }
+    this.game('junta');
+    return true;
   }
 
   // ---------- comportamiento ----------
@@ -294,7 +314,7 @@ export class Sim {
       if (c.dropT > 0) c.dropT -= dt;
       if (c.dizzy > 0) c.dizzy -= dt;
       if (c.path && c.path.length) {
-        const p = c.path[0], dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy), step = SPEED * (c.panic && this.drill > 0 ? 2.2 : 1) * dt;
+        const p = c.path[0], dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy), step = SPEED * (c.panic && this.drill > 0 && this.drillFast ? 2.2 : 1) * dt;
         if (Math.abs(dx) > Math.abs(dy)) c.dir = dx > 0 ? 'right' : 'left'; else if (d > 0.01) c.dir = dy > 0 ? 'down' : 'up';
         if (d <= step) { c.x = p.x; c.y = p.y; c.path.shift(); } else { c.x += dx / d * step; c.y += dy / d * step; }
         c.ft += dt; if (c.ft > 0.13) { c.ft = 0; c.frame = (c.frame + 1) % 4; }

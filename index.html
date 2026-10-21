@@ -9,7 +9,7 @@
 <style>
 :root{
   --bg:#eceae4; --panel:#ffffff; --panel2:#f5f3ee; --ink:#15171b; --muted:#5f6670; --line:#dcd8cf;
-  --sign:#f2c230; --signInk:#111111; --dm:#1d3e6e; --pp:#2a8f53; --hx:#e8453c; --ok:#2a8f53; --warn:#c7741f; --bad:#cf3f3a;
+  --sign:#f2c230; --signInk:#111111; --chart:#2c5aa0; --chartHi:#1d3e6e; --dm:#1d3e6e; --pp:#2a8f53; --hx:#e8453c; --ok:#2a8f53; --warn:#c7741f; --bad:#cf3f3a;
   --shadow:0 1px 0 rgba(0,0,0,.04),0 10px 30px -12px rgba(30,25,10,.25);
   --f-sign:"Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --f-body:-apple-system,BlinkMacSystemFont,"Avenir Next","Helvetica Neue",Arial,sans-serif;
@@ -20,11 +20,12 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0d0f12; --panel:#15181d; --panel2:#1b1f25; --ink:#ecebe6; --muted:#9aa1ab; --line:#2a2f37;
-    --dm:#8fb3ff; --pp:#6fe0a0; --ok:#5ed08e; --warn:#f0a050; --bad:#ff6b63;
+    --dm:#8fb3ff; --pp:#6fe0a0; --ok:#5ed08e; --warn:#f0a050; --bad:#ff6b63; --chart:#5b8fe0; --chartHi:#7aa7f0;
     --shadow:0 1px 0 rgba(255,255,255,.03),0 14px 34px -14px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
+  --chart:#5b8fe0; --chartHi:#7aa7f0;
   --bg:#0d0f12; --panel:#15181d; --panel2:#1b1f25; --ink:#ecebe6; --muted:#9aa1ab; --line:#2a2f37;
   --dm:#8fb3ff; --pp:#6fe0a0; --ok:#5ed08e; --warn:#f0a050; --bad:#ff6b63;
   --shadow:0 1px 0 rgba(255,255,255,.03),0 14px 34px -14px rgba(0,0,0,.7);
@@ -261,6 +262,70 @@ kbd{font:600 11px var(--f-mono);background:var(--panel);border:1px solid var(--l
 #chatInput:focus{outline:2px solid var(--sign);outline-offset:0}
 .cNote{font-size:11px;color:var(--muted);padding:0 12px 10px}
 #stage.grabbing{cursor:grabbing!important}
+.metar{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#0a0b0d;color:#cfd3da;font:600 12px var(--f-mono);box-shadow:inset 0 0 0 1px #24272c;cursor:help}
+.metar b{color:#ffb000}.metar em{font-style:normal;padding:1px 6px;border-radius:4px;background:#1f6e40;color:#fff}
+.metar[data-cat="MVFR"] em{background:#2c5aa0}.metar[data-cat="IFR"] em{background:#b3262b}.metar[data-cat="LIFR"] em{background:#8e2a8e}
+.book{position:fixed;inset:0;background:rgba(10,12,16,.55);z-index:60;display:grid;place-items:center;padding:16px}
+.bookBox{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(980px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+.bkHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.bkHead h2{margin:0;font:700 16px var(--f-sign);letter-spacing:.12em;text-transform:uppercase}
+.bkTabs{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.bkTabs button{border:0;background:var(--panel);padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.bkTabs button[aria-selected="true"]{background:var(--ink);color:var(--panel)}
+#bookRange{margin-left:auto;font:inherit;font-size:12.5px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.cX.dark{background:var(--panel2);color:var(--ink)}
+#bookBody{overflow:auto;padding:16px}
+.bk-load,.bk-empty{color:var(--muted);text-align:center;padding:20px}
+.bk-tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.bk-tile{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.bk-tile b{display:block;font:700 24px var(--f-mono);font-variant-numeric:tabular-nums}
+.bk-tile small{font:700 10px var(--f-sign);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.bk-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bk-charts figure{margin:0;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.bk-charts figcaption{font-weight:700;font-size:13.5px;margin-bottom:8px}.bk-charts figcaption span{font-weight:500;color:var(--muted);font-size:12px;margin-left:6px}
+.bk-svg{width:100%;height:auto;display:block}
+.bk-svg .bar{fill:var(--chart)}.bk-svg .hit{fill:transparent}.bk-svg .tipT.on .bar{fill:var(--chartHi)}.bk-svg .tipT.on .hit{fill:color-mix(in srgb,var(--chart) 8%,transparent)}
+.bk-svg .grid{stroke:var(--line);stroke-width:1}.bk-svg .ax{fill:var(--muted);font:11px var(--f-body)}.bk-svg .lb{fill:var(--ink);font:12px var(--f-body)}
+.bk-note{color:var(--muted);font-size:12.5px;margin:12px 2px 0}
+.bkTip{position:fixed;z-index:80;background:#111317;color:#f1f1f1;font-size:12.5px;padding:6px 9px;border-radius:7px;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.bk-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.bk-filters select,.bk-filters input{font:inherit;font-size:13px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.bk-filters input{flex:1;min-width:180px}
+.bk-tableWrap{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:55vh}
+.bk-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.bk-table th{position:sticky;top:0;background:var(--panel2);text-align:left;font:700 10.5px var(--f-sign);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px}
+.bk-table td{padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+.bk-table td small{display:block;color:var(--muted);margin-top:2px}
+.st{font:700 10px var(--f-sign);letter-spacing:.08em;padding:2px 6px;border-radius:999px;white-space:nowrap}
+.st-ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}.st-bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}.st-run{background:var(--panel2);color:var(--warn)}
+.dundie-head{text-align:center;margin-bottom:14px}.dundie-head b{display:block;font:700 26px var(--f-dm);color:#b8901c;letter-spacing:.04em}.dundie-head span{color:var(--muted);font-size:12.5px}
+.dundies{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.dundie{position:relative;background:linear-gradient(180deg,color-mix(in srgb,#c9a227 12%,var(--panel)),var(--panel));border:1px solid color-mix(in srgb,#c9a227 45%,var(--line));border-radius:14px;padding:14px;text-align:center}
+.dundie .trophy{position:absolute;top:10px;right:12px;font-size:20px}
+.dundie canvas{width:36px;height:60px;image-rendering:pixelated}
+.dundie h4{margin:6px 0 4px;font-size:14px;line-height:1.25}
+.dundie .win{margin:0;font-weight:700}.dundie .win span{display:block;font:600 11.5px var(--f-mono);color:var(--muted)}
+.dundie .speech{font-style:italic;color:var(--muted);font-size:12.5px;margin:8px 0 0}
+.logros{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:10px}
+.logro{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px 10px;opacity:.55}
+.logro.got{opacity:1;border-color:color-mix(in srgb,#c9a227 55%,var(--line));background:color-mix(in srgb,#c9a227 8%,var(--panel))}
+.logro .medal{font-size:20px;color:#c9a227}.logro b{display:block;font-size:13px}.logro small{color:var(--muted);font-size:12px}
+#toasts{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{display:flex;gap:10px;align-items:center;background:#15171b;color:#f2f2f2;border:1px solid #c9a227;border-radius:12px;padding:10px 14px;box-shadow:0 14px 40px rgba(0,0,0,.45);animation:tin .35s ease-out}
+.toast .medal{font-size:24px;color:#f2c94c}.toast b{display:block;color:#f2c94c;font-size:12px;letter-spacing:.1em;text-transform:uppercase}.toast span{font-size:13px}
+.toast.out{opacity:0;transition:opacity .45s}
+@keyframes tin{from{transform:translateY(-16px);opacity:0}}
+.palette{position:fixed;inset:0;z-index:70;background:rgba(10,12,16,.45);display:flex;justify-content:center;align-items:flex-start;padding-top:12vh}
+.palBox{width:min(560px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+#palInput{width:100%;border:0;border-bottom:1px solid var(--line);padding:14px 16px;font:inherit;font-size:15px;background:var(--panel);color:var(--ink);outline:none}
+#palList{list-style:none;margin:0;padding:6px;max-height:320px;overflow:auto}
+#palList li{padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+#palList li.on{background:var(--panel2);box-shadow:inset 3px 0 0 var(--sign)}
+#palList li span{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#palList li.none{color:var(--muted);cursor:default}
+.palHint{font-size:11.5px;color:var(--muted);padding:6px 14px 10px}
+.pEx li.ask{cursor:pointer}.pEx li.ask:hover,.pEx li.ask:focus-visible{border-color:var(--sign);outline:none}
+@media (max-width:760px){.bk-tiles{grid-template-columns:repeat(3,1fr)}.bk-charts{grid-template-columns:1fr}}
 footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
 @media (max-width:620px){
   .wrap{padding:14px 16px 24px}
@@ -288,8 +353,11 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
     </div>
     <div class="right">
       <div class="clk" title="Hora local de Punta Cana y hora UTC"><small>PUJ</small><span id="clkPuj">--:--</span><span class="sep"></span><small>UTC</small><span id="clkUtc">--:--</span></div>
+      <span class="metar" id="metar" hidden></span>
       <span class="pill"><span class="dot" id="liveDot"></span><span id="liveTxt">Conectando…</span></span>
       <button class="btn primary" id="demoBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Simular jornada</button>
+      <button class="btn" id="bookBtn" type="button" title="Historial, gráficas, Dundies y logros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M8 8h6M8 12h6"/></svg>Libro de vuelo</button>
+      <button class="btn" id="palBtn" type="button" title="Hablar con alguien o lanzar un comando (⌘K)">⌘K</button>
       <button class="btn" id="themeBtn" type="button" title="Cambiar tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Tema</button>
     </div>
   </header>
@@ -321,8 +389,11 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
         <button class="btn" id="skyBtn" type="button" aria-pressed="false" title="Cielo real de Punta Cana o un día completo en 60 s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a6 6 0 1 0 9 9 9 9 0 1 1-9-9z"/></svg><span>Cielo real</span></button>
         <button class="btn" id="namesBtn" type="button" aria-pressed="true" title="Nombres sobre quien trabaja"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/></svg>Nombres</button>
         <button class="btn" id="fireBtn" type="button" title="Simulacro de incendio (I)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22c4 0 7-3 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-3 3-5 5-5 8 0 4 3 7 7 7z"/></svg>Simulacro</button>
+        <button class="btn" id="juntaBtn" type="button" title="Junta del equipo: Michael lee el parte del día"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 20c0-2.5 1.5-4.5 4-4.5"/></svg>Junta</button>
         <button class="btn" id="tvBtn" type="button" title="Modo TV: la terminal a pantalla completa (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>TV</button>
         <button class="btn" id="soundBtn" type="button" aria-pressed="false" title="Campanita de aeropuerto al aterrizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span>Silencio</span></button>
+        <button class="btn" id="paBtn" type="button" aria-pressed="false" title="Anuncios por megafonía con voz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10v4h4l6 4V6L7 10zM17 8a5 5 0 0 1 0 8"/></svg>Megafonía</button>
+        <button class="btn" id="notifBtn" type="button" aria-pressed="false" title="Avisos del sistema cuando un vuelo aterriza, se demora o se cancela y no estás mirando"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0"/></svg>Avisos</button>
         <div class="legend"><span><i style="background:#1d3e6e"></i>Dunder Mifflin</span><span><i style="background:#2a8f53"></i>Pied Piper</span><span><i style="background:#e8453c"></i>Hooli · Antigravity</span><span><i style="background:#c9a227"></i>memo del CEO</span><span><i style="background:#fff"></i>avión de papel = tarea</span></div>
       </div>
     </section>
@@ -341,7 +412,7 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
           <div class="stat"><b id="stFlights">0</b><small>Vuelos hoy</small></div>
           <div class="stat"><b id="stAir">0</b><small>En vuelo</small></div>
           <div class="stat"><b id="stBlock">—</b><small>Bloque medio</small></div>
-          <div class="stat"><b id="stReq">0</b><small>Pedidos</small></div>
+          <div class="stat" title="Tokens gastados hoy por los agentes (vuelos y chat)"><b id="stFuel">0</b><small>Combustible</small></div>
         </div>
     </section>
 
@@ -363,6 +434,17 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
     </section>
   </div>
 
+  <div id="book" class="book" hidden role="dialog" aria-label="Libro de vuelo">
+    <div class="bookBox">
+      <div class="bkHead"><h2>Libro de vuelo</h2>
+        <div class="bkTabs" role="tablist"><button data-btab="resumen" aria-selected="true" role="tab">Resumen</button><button data-btab="bitacora" aria-selected="false" role="tab">Bitácora</button><button data-btab="dundies" aria-selected="false" role="tab">Dundies</button><button data-btab="logros" aria-selected="false" role="tab">Logros</button></div>
+        <select id="bookRange" aria-label="Periodo"><option value="7">7 días</option><option value="30" selected>30 días</option><option value="90">90 días</option></select>
+        <button class="cX dark" id="bookClose" type="button" aria-label="Cerrar">✕</button></div>
+      <div id="bookBody"></div>
+    </div>
+  </div>
+  <div id="bkTip" class="bkTip" hidden></div>
+  <div id="palette" class="palette" hidden><div class="palBox"><input id="palInput" placeholder="@dwight revisa aerointel…  o escribe un comando: junta, simulacro, dundies" autocomplete="off"><ul id="palList"></ul><div class="palHint">↑↓ para elegir · Enter para ejecutar · Esc para cerrar</div></div></div>
   <aside id="chat" class="chat" hidden aria-label="Chat con el agente">
     <div class="cHead"><canvas id="chatPic" width="12" height="20"></canvas><div><div id="chatName"></div><div id="chatRole"></div></div>
       <button class="cX" id="chatReset" type="button" title="Empezar una conversación nueva">Nueva</button><button class="cX" id="chatClose" type="button" aria-label="Cerrar">✕</button></div>
@@ -370,7 +452,7 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
     <form id="chatForm"><textarea id="chatInput" rows="2" placeholder="Escribe tu mensaje… (Enter envía, Shift+Enter salta línea)"></textarea><button class="btn primary" id="chatSend" type="submit">Enviar</button></form>
     <div class="cNote">Usa tu Claude Code de este Mac: cada mensaje gasta tokens como un encargo normal.</div>
   </aside>
-  <footer><span class="keys">Arrastra a cualquiera para moverlo · clic en la máquina, el café, Anton, la pizarra, el ping-pong, la hamaca o el gato · Atajos: <kbd>S</kbd> simular · <kbd>I</kbd> simulacro · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
+  <footer><span class="keys"><kbd>⌘K</kbd> hablar con quien sea · Arrastra a cualquiera para moverlo · clic en la máquina, el café, Anton, la pizarra, el ping-pong, la hamaca o el gato · Atajos: <kbd>S</kbd> simular · <kbd>I</kbd> simulacro · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
 </div>
 <script type="module" src="static/js/main.js"></script>
 </body>

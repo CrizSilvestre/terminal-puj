@@ -199,9 +199,17 @@ export class Sky {
     this.planes = []; this.clouds = []; this.birds = null; this.stars = [];
     for (let i = 0; i < 6; i++) this.clouds.push({ x: Math.random() * W, y: 11 + Math.random() * 14, s: 0.6 + Math.random() * 0.8, v: 1 + Math.random() * 2 });
     for (let i = 0; i < 70; i++) this.stars.push([Math.floor(Math.random() * W), 9 + Math.floor(Math.random() * 22), Math.random()]);
-    this.ambientT = 8; this.vehicles = []; this.vehT = 3;
+    this.ambientT = 8; this.vehicles = []; this.vehT = 3; this.weather = null; this.flash = 0;
+    this.rain = Array.from({ length: 90 }, () => [Math.random() * W, 9 + Math.random() * 47, 0.6 + Math.random() * 0.8]);
   }
-  spawn(kind, liv, dir = Math.random() < 0.5 ? 1 : -1) {
+  // Dirección de pista según el viento real: se despega y aterriza CONTRA el viento.
+  runwayDir() {
+    const w = this.weather; if (!w || !(w.wspd >= 3) || w.wdir == null) return null;
+    const e = Math.sin(w.wdir * Math.PI / 180); // viento del este (+) → se opera hacia el este (derecha)
+    return Math.abs(e) < 0.2 ? null : (e > 0 ? 1 : -1);
+  }
+  spawn(kind, liv, dir) {
+    if (dir == null) dir = (kind !== 'taxi' && this.runwayDir()) || (Math.random() < 0.5 ? 1 : -1);
     const p = { kind, liv, dir, t: 0, gear: true, rot: 0 };
     if (kind === 'takeoff') { p.x = dir > 0 ? -34 : W + 4; p.y = 52; p.v = 12; }
     else if (kind === 'land' || kind === 'goaround') { p.x = dir > 0 ? -34 : W + 4; p.y = 14; p.v = 78; p.gear = true; }
@@ -223,6 +231,10 @@ export class Sky {
     if (!this.birds && Math.random() < dt / 40) this.birds = { x: -10, y: 16 + Math.random() * 10, t: 0 };
     if (this.birds) { this.birds.x += dt * 14; this.birds.t += dt; if (this.birds.x > W + 10) this.birds = null; }
     for (const c of this.clouds) { c.x += c.v * dt; if (c.x > W + 40) { c.x = -40; c.y = 11 + Math.random() * 14; } }
+    const wx = this.weather || {};
+    if (wx.rain) for (const r of this.rain) { r[1] += dt * 90 * r[2]; r[0] -= dt * 18 * r[2]; if (r[1] > 56) { r[1] = 9; r[0] = Math.random() * (W + 20); } }
+    if (wx.storm && Math.random() < dt / 7) this.flash = 0.35;
+    if (this.flash > 0) this.flash -= dt;
     for (const p of this.planes) {
       p.t += dt; const d = p.dir;
       const rel = d > 0 ? p.x : W - p.x; // distancia recorrida desde el borde de entrada
@@ -261,8 +273,10 @@ export class Sky {
     }
     // nubes
     const cl = n > 0.5 ? 'rgba(120,130,170,0.35)' : h > 17 && h < 19.5 ? 'rgba(255,200,180,0.85)' : 'rgba(255,255,255,0.9)';
-    for (const c of this.clouds) {
-      ctx.fillStyle = cl; const s = c.s;
+    const wx = this.weather || {}, nCloud = wx.cover === 'OVC' || wx.cover === 'VV' ? 6 : wx.cover === 'BKN' ? 6 : wx.cover === 'SCT' ? 4 : wx.cover === 'FEW' ? 2 : wx.cover === 'CLR' || wx.cover === 'SKC' ? 0 : 3;
+    if (wx.cover === 'OVC' || wx.cover === 'BKN' || wx.rain) { ctx.fillStyle = `rgba(${n > 0.5 ? '40,45,60' : wx.rain ? '112,120,134' : '150,158,170'},${wx.rain ? 0.78 : wx.cover === 'OVC' ? 0.55 : 0.3})`; ctx.fillRect(0, 9, W, 28); }
+    for (const c of this.clouds.slice(0, nCloud)) {
+      ctx.fillStyle = wx.rain ? 'rgba(120,128,140,0.9)' : cl; const s = c.s;
       ctx.fillRect(c.x, c.y, 18 * s, 3); ctx.fillRect(c.x + 3 * s, c.y - 2, 9 * s, 2); ctx.fillRect(c.x + 8 * s, c.y - 3, 6 * s, 1);
     }
     // pájaros
@@ -328,6 +342,19 @@ export class Sky {
       }
       ctx.restore();
     }
+    // manga de viento: apunta hacia donde sopla el viento real
+    { const wsx = 136, base = 44; R(ctx, wsx, base - 14, 1, 14, n > 0.5 ? '#5b6168' : '#d8d8d8');
+      const w = this.weather, kt = w?.wspd ?? 6, from = w?.wdir ?? 90, to = -Math.sin(from * Math.PI / 180) || 1;
+      const len = Math.max(2, Math.min(7, Math.round(kt / 2))), droop = kt < 3 ? 1 : 0, flap = Math.sin(t * 7) > 0.6 ? 1 : 0;
+      for (let i = 0; i < len; i++) P(ctx, wsx + (to > 0 ? 1 + i : -1 - i), base - 14 + (droop ? i : Math.floor(i / 4) + (i === len - 1 ? flap : 0)), i % 2 ? '#f4f4f4' : '#f26a1b'); }
+    if (wx.rain) {
+      ctx.fillStyle = n > 0.5 ? 'rgba(20,25,35,0.35)' : 'rgba(70,80,95,0.28)'; ctx.fillRect(0, 9, W, 47); // todo más apagado
+      ctx.fillStyle = n > 0.5 ? 'rgba(170,190,220,0.6)' : 'rgba(205,220,240,0.85)';
+      for (const [rx, ry] of this.rain) { const x = Math.round(rx), y = Math.round(ry); ctx.fillRect(x, y, 1, 3); ctx.fillRect(x - 1, y + 3, 1, 1); }
+      // gotas que resbalan por el cristal
+      for (let i = 0; i < 26; i++) { const gx = (i * 53 + 17) % W, gy = 12 + ((i * 29 + Math.floor(t * (6 + (i % 4) * 3))) % 42); ctx.fillStyle = 'rgba(230,240,255,0.7)'; ctx.fillRect(gx, gy, 1, 2); ctx.fillStyle = 'rgba(230,240,255,0.25)'; ctx.fillRect(gx, gy - 4, 1, 4); }
+    }
+    if (this.flash > 0) { ctx.fillStyle = `rgba(235,240,255,${this.flash * 2})`; ctx.fillRect(0, 9, W, 47); }
     // reflejo del cristal
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
     for (const [x0, y0, w0] of WINDOWS) for (let i = 0; i < w0; i += 44) { ctx.beginPath(); ctx.moveTo(x0 + i + 6, y0); ctx.lineTo(x0 + i + 14, y0); ctx.lineTo(x0 + i + 2, y0 + 47); ctx.lineTo(x0 + i - 6, y0 + 47); ctx.fill(); }

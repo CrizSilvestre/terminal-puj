@@ -242,6 +242,7 @@ export class Flights {
       if (!f || f.end) return null; // fin repetido: no se aterriza dos veces
       if (f.bg && e.event === 'PostToolUse') return null; // solo es el acuse de lanzamiento; sigue en vuelo
       f.end = e.ts; f.ok = e.event === 'PostToolUse'; if (e.result) f.result = e.result;
+      if (e.totalTokens) f.tokens = e.totalTokens; if (e.model) f.model = e.model; if (e.totalToolUseCount) f.tools = e.totalToolUseCount;
       return { type: f.ok ? 'land' : 'cancel', flight: f };
     }
     return null;
@@ -298,6 +299,7 @@ export class Flights {
       otp: landed.length ? Math.round(100 * ontime.length / landed.length) : null,
       block,
       requests: this.requests.filter(r => r.ts >= s0).length,
+      fuel: today.reduce((a, f) => a + (f.tokens || 0), 0),
       cancelled: today.filter(f => f.end && !f.ok).length,
     };
   }

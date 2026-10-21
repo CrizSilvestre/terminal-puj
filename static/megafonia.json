@@ -1,0 +1,45 @@
+{
+  "embarque": [
+    "Atención, por favor. Iniciamos el embarque del vuelo {vuelo} con destino {destino}, a cargo de {agente}, por la puerta {puerta}.",
+    "Última llamada a los pasajeros del vuelo {vuelo} hacia {destino}. El oficial {agente} les espera en la puerta {puerta}.",
+    "Atención. El vuelo {vuelo} con destino {destino} está listo para abordar. El agente {agente} supervisa el embarque en la puerta {puerta}.",
+    "Pasajeros con destino a {destino}, el vuelo {vuelo} asignado a {agente} ha comenzado el embarque inmediato en la puerta {puerta}.",
+    "Se informa el inicio de embarque del vuelo {vuelo} a {destino}. Favor tener sus notas de entrega listas ante el agente {agente} en puerta {puerta}.",
+    "Atención, pasajeros del vuelo {vuelo} hacia {destino}. El comandante {agente} solicita abordar de inmediato por la puerta {puerta}."
+  ],
+  "aterrizaje": [
+    "Atención, por favor. Anunciamos el feliz arribo del vuelo {vuelo} procedente de {destino}, operado exitosamente por {agente}.",
+    "El vuelo {vuelo} con destino {destino} ha completado su trayecto sin novedades. Agradecemos al agente {agente} por sus servicios.",
+    "Confirmamos la llegada a tiempo del vuelo {vuelo}. El comandante {agente} ha entregado todos los reportes de {destino} en la puerta {puerta}.",
+    "Atención. El vuelo {vuelo} con destino {destino} acaba de tocar tierra en pista principal. Buen trabajo por parte del agente {agente}.",
+    "Informamos el aterrizaje confirmado del vuelo {vuelo}. El agente {agente} ha concluido satisfactoriamente las operaciones para {destino}.",
+    "El vuelo {vuelo} ha finalizado su ruta a {destino}. El agente {agente} invita a celebrar con un café de filtro en la sala de llegadas."
+  ],
+  "demora": [
+    "Atención, por favor. El vuelo {vuelo} con destino {destino} presenta una demora estimada de {min} minutos. Agradecemos su paciencia.",
+    "Informamos que el vuelo {vuelo} a cargo de {agente} experimenta un retraso técnico de {min} minutos. Rogamos esperar en la puerta {puerta}.",
+    "Aviso importante. Por causas atribuibles a exceso de reuniones, el vuelo {vuelo} hacia {destino} se encuentra demorado {min} minutos.",
+    "Pasajeros del vuelo {vuelo} rumbo a {destino}, se registra una demora de {min} minutos. El agente {agente} continúa resolviendo la incidencia."
+  ],
+  "cancelado": [
+    "Atención. Lamentamos comunicar que el vuelo {vuelo} con destino {destino} ha sido cancelado. Favor dirigirse a la puerta {puerta}.",
+    "Aviso a los pasajeros del vuelo {vuelo} operado por {agente}. El servicio ha sido cancelado definitivamente por fallas en el sistema.",
+    "Atención, por favor. El vuelo {vuelo} hacia {destino} queda cancelado. Se ruega no solicitar explicaciones al agente {agente} en este momento.",
+    "Se notifica la cancelación inmediata del vuelo {vuelo} con destino {destino}. Todo el personal debe reportar el incidente al supervisor."
+  ],
+  "simulacro": [
+    "Atención, personal de la terminal. Se declara simulacro de evacuación por humo en la cocina. Mantengan la calma y caminen hacia la salida.",
+    "Aviso general de seguridad. Esto es un simulacro de incendio. Favor desalojar las oficinas ordenadamente y no utilizar las fotocopiadoras.",
+    "Atención a todos los agentes. Simulacro de emergencia en progreso. No intenten rescatar sus grapadoras y sigan las luces de emergencia."
+  ],
+  "junta": [
+    "Atención a todo el personal. La gerencia general convoca a una reunión urgente e indispensable en la sala de conferencias número uno.",
+    "Llamado urgente para todos los agentes de la terminal. Favor presentarse de inmediato en la sala principal para una junta extraordinaria.",
+    "Atención. El director solicita la presencia de todo el equipo en la sala central. Habrá anuncios importantes y posiblemente rosquillas."
+  ],
+  "pedido": [
+    "Atención en la torre de control. La dirección ejecutiva ha emitido una nueva orden prioritaria que requiere asignación inmediata.",
+    "Aviso para operaciones. Se acaba de recibir un nuevo requerimiento urgente desde la presidencia con destino prioritario.",
+    "Atención, torre. Entrando pedido especial de alta prioridad emitido por el director ejecutivo para tramitación sin demoras."
+  ]
+}
