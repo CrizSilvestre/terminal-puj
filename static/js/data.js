@@ -5,6 +5,12 @@ export const W = 480, H = 270;
 // ---------- Elenco ----------
 // desk: {x,y,w,dir,kind}  dir 'up' = de espaldas (vemos su pantalla), 'down' = de frente.
 export const CAST = {
+  // ======== DIRECCIÓN ========
+  ceo: { name: 'Criz Silvestre', wing: 'ceo', gate: 'C1', role: 'CEO · Dirección general',
+    blurb: 'Tú. Las órdenes salen de esta oficina: cada pedido viaja como memo dorado a la Torre, donde Michael lo reparte.',
+    use: 'Escríbele a Claude en el chat: tu avatar firma el memo y lo envía a la Torre.', model: '—', access: 'todo',
+    look: { skin: '#f1cfb2', hair: '#151210', style: 'short', shirt: '#f4f4f4', jacket: '#1f2430', tie: '#c9a227', pants: '#1f2430', glasses: true, goatee: '#151210' },
+    desk: { x: 128, y: 124, w: 34, dir: 'down', kind: 'exec', deco: 'ceo' } },
   // ======== DUNDER MIFFLIN ========
   michael: { name: 'Michael Scott', wing: 'dm', gate: 'T1', role: 'Regional Manager · Torre de control',
     blurb: 'La sesión principal de Claude. Recibe tus pedidos, autoriza los despegues y junta los resultados.',
@@ -99,6 +105,7 @@ export const CAST = {
     desk: { x: 304, y: 184, w: 28, dir: 'down', kind: 'beanbag' } },
 };
 
+export const CEO_IDS = ['ceo'];
 export const DM_IDS = ['michael', 'pam', 'dwight', 'jim', 'angela', 'oscar', 'kevin', 'creed', 'ryan', 'toby', 'darryl'];
 export const PP_IDS = ['richard', 'gilfoyle', 'dinesh', 'jared', 'monica', 'erlich', 'bighead'];
 
@@ -136,6 +143,7 @@ export const POI = {
 
 // Preferencias de paseo por personaje (además de las genéricas).
 export const PREFS = {
+  ceo: ['windowDM', 'coffee', 'reception', 'tableA'],
   michael: ['towerWin', 'reception', 'tobyDoor', 'coffee', 'tableA'],
   dwight: ['copier', 'windowDM', 'coffee', 'rampCart'],
   jim: ['reception', 'coffee', 'tableA', 'windowDM'],
@@ -183,10 +191,10 @@ export function destino(cwd) {
 
 export const KNOWN = new Set(Object.keys(CAST));
 // Cómo se le llama en la oficina (Gilfoyle es Gilfoyle, no Bertram).
-const NICK = { gilfoyle: 'Gilfoyle', bighead: 'Big Head', hooli: 'Hooli XYZ' };
+const NICK = { gilfoyle: 'Gilfoyle', bighead: 'Big Head', hooli: 'Hooli XYZ', ceo: 'Criz' };
 export const nick = id => NICK[id] || CAST[id]?.name.split(' ')[0] || String(id ?? '—');
 export const shortName = id => !id ? '—' : id === 'hooli' ? 'HOOLI' : nick(id).toUpperCase();
-export const who = a => (a && KNOWN.has(a) && a !== 'michael') ? a : 'creed';
+export const who = a => (a && KNOWN.has(a) && a !== 'michael' && a !== 'ceo') ? a : 'creed';
 
 function hash(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 export function flightNo(agent, id) {

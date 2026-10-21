@@ -66,7 +66,9 @@ function act(a, silent) {
   if (a.type === 'request') {
     if (silent) return;
     say('pedido', { vuelo: a.req.no, destino: 'TORRE', desc: trim(a.req.desc, 70), agente: 'Michael' });
-    ui.bubble('michael', 'Nuevo pedido: ' + trim(a.req.desc, 60), 4500, 'event');
+    sim.memo(); // el memo sale de la oficina del CEO
+    ui.bubble('ceo', trim(a.req.desc, 70), 4200, 'event');
+    const g = gen; setTimeout(() => { if (g === gen) ui.bubble('michael', pick(['Recibido, jefe. Despachando.', 'Copiado, CEO. Ya reparto.', '¡Memo del CEO! Todos a sus puestos.']), 3200, 'event'); }, 2200);
   } else if (a.type === 'stop') {
     if (silent || !a.req) return;
     say('fin', { vuelo: a.req?.no || 'MS100', destino: a.req ? 'PUJ' : 'PUJ', agente: 'Michael' });
@@ -253,6 +255,7 @@ function frame(nowMs) {
   const at = name => [...Object.values(sim.chars)].some(c => c.poi === name && !c.path);
   const glows = [];
   for (const c of Object.values(sim.chars)) if (c.sitting && (working.has(c.id) || (c.id === 'michael' && sim.michaelBusy))) glows.push(c.seat.dir === 'up' ? [c.desk.x + c.desk.w / 2, c.desk.y - 1, 16] : [c.x, c.y - 13, 12]);
+  if (sim.chars.ceo?.sitting && sim.ceoBusy()) glows.push([sim.chars.ceo.x, sim.chars.ceo.y - 13, 12, 'rgba(255,214,120,A)']);
   for (const c of sim.contractors) if (c.sitting) glows.push([c.desk.x + c.desk.w / 2, c.desk.y - 1, 14, 'rgba(244,180,0,A)']);
   glows.push([268, 162, 18, 'rgba(255,90,90,A)', 0.12], [423, 78, 14, 'rgba(61,255,122,A)', 0.14], [240, 76, 14, 'rgba(125,255,176,A)', 0.14], [211, 122, 8, 'rgba(255,80,80,A)', 0.1]);
   const env = { t, n, h, working, seated, michael: sim.michaelBusy, hooliOn: sim.contractors.filter(c => c.sitting && !c.leaving).length,
@@ -289,6 +292,10 @@ function frame(nowMs) {
   fit();
   [LINES, RADIO, PROFILES] = await Promise.all([load('static/dialogos.json'), load('static/radio.json'), load('static/perfiles.json')]);
   if (PROFILES) ui.select(ui.selected, !!sim.selected);
+  if (LINES?.idle) { // frases del CEO (tú)
+    LINES.idle.ceo = ['¿Cómo va la OTP de hoy?', 'Quiero ese parser listo antes del vuelo de las 6.', 'Buen trabajo, equipo. Sigan así.', 'Michael, ¿quién está en vuelo?', 'Esta oficina ya parece una aerolínea.', 'Revisen todo antes del push, por favor.'];
+    LINES.trabajando = LINES.trabajando || {}; LINES.trabajando.ceo = ['Firmando el memo para la Torre.'];
+  }
   await poll(); await pollAgy();
   if (!liveOk) { PUBLIC = true; document.getElementById('demoBtn').hidden = true; document.getElementById('agyState').textContent = 'Demo: la versión en vivo corre en tu Mac'; runDemo(); }
   setInterval(poll, 1500); setInterval(pollAgy, 5000);

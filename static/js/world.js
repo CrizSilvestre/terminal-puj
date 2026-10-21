@@ -20,7 +20,8 @@ export const OBSTACLES = [
   [204, 126, 26, 10], [262, 124, 10, 14], [260, 156, 16, 20], [232, 166, 16, 10], [14, 166, 14, 14],
   [414, 64, 18, 30], [440, 66, 34, 26], [300, 226, 40, 22], [66, 238, 26, 12], [140, 206, 16, 10],
   [466, 118, 4, 34], [432, 144, 4, 8], [470, 144, 4, 8],
-  [190, 98, 8, 8], [282, 176, 8, 8], [192, 246, 8, 8], [470, 186, 8, 8], [150, 236, 6, 6], [158, 252, 6, 6],
+  [282, 176, 8, 8],
+  [100, 104, 90, 2], [100, 104, 2, 42], [188, 104, 2, 42], [100, 144, 62, 2], [176, 144, 14, 2], [104, 122, 12, 18], [178, 110, 8, 8], [192, 246, 8, 8], [470, 186, 8, 8], [150, 236, 6, 6], [158, 252, 6, 6],
 ];
 for (const c of Object.values(CAST)) if (c.desk.kind !== 'beanbag') OBSTACLES.push([c.desk.x, c.desk.y, c.desk.w, c.desk.kind === 'counter' ? 12 : 14]);
 for (const d of HOOLI_DESKS) OBSTACLES.push([d.x, d.y, d.w, 14]);
@@ -82,6 +83,17 @@ export function buildStatic() {
   const glass = (gx, gy, gw, gh) => { R(x, gx, gy, gw, gh, '#7fa9bb'); };
   glass(202, 64, 2, 54); glass(276, 64, 2, 54); glass(202, 116, 32, 2); glass(246, 116, 32, 2);
   R(x, 203, 64, 1, 52, '#cfe7f1'); R(x, 277, 64, 1, 52, '#cfe7f1'); R(x, 202, 116, 32, 1, '#cfe7f1'); R(x, 246, 116, 32, 1, '#cfe7f1');
+  // --- oficina del CEO: parquet, alfombra y cristal ---
+  for (let yy = 104; yy < 146; yy++) for (let xx = 100; xx < 190; xx++) {
+    const row = Math.floor(yy / 3), off = (row * 7) % 20, plank = Math.floor((xx + off) / 20), seam = (xx + off) % 20 === 0;
+    const tone = ['#a8723f', '#9c6838', '#b07a45'][(plank + row) % 3];
+    P(x, xx, yy, seam ? '#8a5a30' : yy % 3 === 0 ? '#976435' : noise(xx, yy) > 0.9 ? '#b98650' : tone);
+  }
+  R(x, 118, 116, 56, 26, '#7a1f2b'); R(x, 119, 117, 54, 24, '#8e2633'); R(x, 121, 119, 50, 20, '#7a1f2b');
+  for (let i = 0; i < 54; i += 3) { P(x, 119 + i, 117, '#c9a227'); P(x, 119 + i, 140, '#c9a227'); }
+  glass(100, 104, 90, 2); glass(100, 104, 2, 42); glass(188, 104, 2, 42); glass(100, 144, 62, 2); glass(176, 144, 14, 2);
+  R(x, 101, 104, 88, 1, '#cfe7f1'); R(x, 101, 104, 1, 40, '#cfe7f1'); R(x, 189, 104, 1, 40, '#cfe7f1');
+  R(x, 166, 98, 22, 7, '#1f2430'); R(x, 166, 104, 22, 1, '#0f1218'); drawText(x, 'C1', 168, 99, '#ffffff'); drawText(x, 'CEO', 177, 99, '#e8c24a');
   // alfombrilla de la puerta A1
   R(x, 226, 258, 28, 10, '#3a3533'); R(x, 227, 259, 26, 8, '#4a4441');
   // --- pared del fondo ---
@@ -330,11 +342,12 @@ function deskTop(ctx, d, kind) {
   const pal = {
     wood: ['#b48653', '#c99a65', '#8a6338'], white: ['#e3e0d9', '#f3f1ec', '#b6b2a8'], metal: ['#8d949b', '#a6adb4', '#61686f'],
     hooli: ['#f0efeb', '#ffffff', '#c9c6be'], tiki: ['#c8a35a', '#d9b56c', '#916f33'], counter: ['#d8cbb3', '#e8dcc5', '#7a5c3c'],
-    atc: ['#2e3540', '#3b4452', '#1d222a'],
+    atc: ['#2e3540', '#3b4452', '#1d222a'], exec: ['#5a3a24', '#7a5236', '#3b2516'],
   }[kind] || ['#b48653', '#c99a65', '#8a6338'];
   const hgt = kind === 'counter' ? 12 : 14, face = kind === 'counter' ? 6 : 4;
   R(ctx, x + 1, y + hgt, w - 2, 2, 'rgba(0,0,0,0.18)');
   R(ctx, x, y, w, hgt - face, pal[0]); R(ctx, x, y, w, 1, pal[1]); R(ctx, x, y + hgt - face, w, face, pal[2]);
+  if (kind === 'exec') { R(ctx, x, y + hgt - face, w, 1, '#c9a227'); P(ctx, x + 1, y + hgt, '#2a1a10'); P(ctx, x + w - 2, y + hgt, '#2a1a10'); }
   if (kind === 'tiki') for (let i = x + 2; i < x + w; i += 4) R(ctx, i, y + 1, 1, hgt - face - 1, '#b38d45');
   if (kind === 'white' || kind === 'hooli') { P(ctx, x + 1, y + hgt, '#7d838c'); P(ctx, x + w - 2, y + hgt, '#7d838c'); }
   if (kind === 'counter') { R(ctx, x + 2, y + hgt - face + 1, w - 4, 1, shade(pal[2], 0.2)); drawText(ctx, 'INFO', x + w / 2 - 7, y + hgt - 5, '#f2c230'); }
@@ -372,6 +385,7 @@ function deco(ctx, d, type, t) {
     case 'tiki': R(ctx, r - 6, y + 2, 3, 5, '#8a5a2b'); P(ctx, r - 5, y + 3, '#2b1b0e'); P(ctx, r - 5, y + 1, '#f26b8a'); break;
     case 'flowers': R(ctx, x + 3, y + 3, 3, 4, '#7fb3d5'); P(ctx, x + 3, y + 2, '#f28fb1'); P(ctx, x + 5, y + 1, '#f2c94c'); P(ctx, x + 4, y + 2, '#f28fb1'); break;
     case 'laptop': break;
+    case 'ceo': R(ctx, x + 2, y + 5, 9, 3, '#c9a227'); R(ctx, x + 3, y + 6, 7, 1, '#3b2516'); R(ctx, r - 6, y + 3, 3, 4, '#f4f4f4'); P(ctx, r - 5, y + 4, '#510c76'); R(ctx, r - 11, y + 2, 4, 5, '#2b2f35'); break;
   }
 }
 
@@ -422,7 +436,7 @@ export function buildProps() {
       props.push({ y: d.y + 14, id, draw(ctx, env) {
         deskTop(ctx, d, d.kind);
         const cx = d.x + w2(d), on = env.working.has(id);
-        if (d.deco === 'laptop' || d.kind === 'counter') { R(ctx, cx - 5, d.y + 1, 10, 5, '#b9bec6'); R(ctx, cx - 5, d.y + 1, 10, 1, '#d7dbe0'); if (on) R(ctx, cx - 4, d.y, 8, 1, '#5fd0ea'); }
+        if (d.deco === 'laptop' || d.kind === 'counter' || d.kind === 'exec') { R(ctx, cx - 5, d.y + 1, 10, 5, '#b9bec6'); R(ctx, cx - 5, d.y + 1, 10, 1, '#d7dbe0'); if (on) R(ctx, cx - 4, d.y, 8, 1, '#5fd0ea'); }
         else { R(ctx, cx - 6, d.y - 1, 12, 7, '#2b2f35'); R(ctx, cx - 5, d.y, 10, 1, '#3a3f47'); R(ctx, cx - 1, d.y + 6, 2, 2, '#2b2f35'); if (on) R(ctx, cx - 6, d.y - 2, 12, 1, 'rgba(95,208,234,0.8)'); }
         deco(ctx, d, d.deco, env.t);
       } });
@@ -459,6 +473,10 @@ export function buildProps() {
   props.push({ y: 180, draw(ctx, env) { // copiadora
     R(ctx, 14, 168, 14, 12, '#c9ccd1'); R(ctx, 14, 168, 14, 2, '#e3e5e8'); R(ctx, 15, 172, 12, 1, '#8d939b'); P(ctx, 25, 170, Math.floor(env.t) % 2 ? '#3b9b5a' : '#1f4f30');
     if (env.copying) { const k = Math.floor(env.t * 4) % 4; R(ctx, 16 + k, 166, 5, 2, '#ffffff'); }
+  } });
+  props.push({ y: 141, draw(ctx) { // sofá de cuero del CEO
+    R(ctx, 104, 122, 12, 18, '#4a2a1a'); R(ctx, 106, 124, 8, 14, '#6b3b22'); R(ctx, 104, 122, 12, 2, '#5c3420'); R(ctx, 104, 138, 12, 2, '#5c3420');
+    P(ctx, 109, 128, '#8a4e2c'); P(ctx, 109, 133, '#8a4e2c'); R(ctx, 105, 141, 10, 1, 'rgba(0,0,0,0.25)');
   } });
   // --- Pied Piper ---
   props.push({ y: 94, draw(ctx, env) { // Anton
@@ -500,7 +518,7 @@ export function buildProps() {
   } });
   for (const [cx, cy] of [[152, 240], [160, 256]]) props.push({ y: cy + 2, draw(ctx) { R(ctx, cx, cy - 4, 2, 5, '#f26a1b'); R(ctx, cx - 1, cy - 1, 4, 1, '#f4f4f4'); R(ctx, cx - 1, cy + 1, 4, 1, '#c9541a'); } });
   // plantas
-  for (const [px, py] of [[190, 98], [282, 176], [192, 246], [470, 186]]) props.push({ y: py + 8, draw(ctx) {
+  for (const [px, py] of [[282, 176], [192, 246], [470, 186], [178, 110]]) props.push({ y: py + 8, draw(ctx) {
     R(ctx, px + 1, py + 4, 6, 4, '#b5562c'); R(ctx, px + 1, py + 4, 6, 1, '#cf6d3f');
     for (const [a, b, c] of [[3, 0, '#4f9d3a'], [1, 1, '#3f7d3a'], [5, 1, '#3f7d3a'], [0, 2, '#4f9d3a'], [6, 2, '#4f9d3a'], [2, 2, '#6bbf4f'], [4, 3, '#6bbf4f'], [3, 1, '#6bbf4f']]) P(ctx, px + a, py + b, c);
   } });

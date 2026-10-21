@@ -186,6 +186,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .pHead{display:flex;gap:12px;align-items:center;margin:-14px -14px 12px;padding:14px;border-radius:12px 12px 0 0;color:#fff}
 .pHead.dm{background:linear-gradient(135deg,#1d3e6e,#2c5a96)}
 .pHead.pp{background:linear-gradient(135deg,#1f6e40,#2fa35f)}
+.pHead.ceo{background:linear-gradient(135deg,#1f2430,#4a3c1c)} .pHead.ceo .pName{color:#f2d36b}
 .pPic{width:60px;height:100px;image-rendering:pixelated;background:rgba(255,255,255,.14);border-radius:8px;padding:6px 12px;flex:none;box-sizing:content-box}
 .pName{font:700 19px var(--f-dm);letter-spacing:.02em}
 .pHead.pp .pName{font-family:var(--f-pp);letter-spacing:0}
@@ -218,6 +219,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .crew{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:12px 8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;transition:transform .15s,box-shadow .15s}
 .crew:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:#1d3e6e}
 .crew.pp:before{background:#2a8f53}
+.crew.ceo:before{background:linear-gradient(90deg,#c9a227,#f2d36b)}
+.crewHead.ceo{color:#b8901c}
+.chip[data-st="memo"]{background:color-mix(in srgb,#c9a227 28%,transparent);color:var(--ink)}
 .crew:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .crew[aria-pressed="true"]{outline:2px solid var(--sign);outline-offset:1px}
 .crew canvas{width:36px;height:60px;image-rendering:pixelated;margin:4px 0 4px}
@@ -266,6 +270,7 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
 
   <nav class="wayfind" aria-label="Puertas">
     <span class="g"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Salidas <span class="arrow">→</span></span>
+    <span class="g"><span class="gate">C1</span>CEO</span>
     <span class="g"><span class="gate">T1</span>Torre</span>
     <span class="g"><span class="gate">A1–A9</span>Dunder Mifflin</span>
     <span class="g"><span class="gate">R1</span>Rampa</span>
@@ -291,7 +296,7 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
         <button class="btn" id="namesBtn" type="button" aria-pressed="true" title="Nombres sobre quien trabaja"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/></svg>Nombres</button>
         <button class="btn" id="tvBtn" type="button" title="Modo TV: la terminal a pantalla completa (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>TV</button>
         <button class="btn" id="soundBtn" type="button" aria-pressed="false" title="Campanita de aeropuerto al aterrizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span>Silencio</span></button>
-        <div class="legend"><span><i style="background:#1d3e6e"></i>Dunder Mifflin</span><span><i style="background:#2a8f53"></i>Pied Piper</span><span><i style="background:#e8453c"></i>Hooli · Antigravity</span><span><i style="background:#fff"></i>avión de papel = tarea</span></div>
+        <div class="legend"><span><i style="background:#1d3e6e"></i>Dunder Mifflin</span><span><i style="background:#2a8f53"></i>Pied Piper</span><span><i style="background:#e8453c"></i>Hooli · Antigravity</span><span><i style="background:#c9a227"></i>memo del CEO</span><span><i style="background:#fff"></i>avión de papel = tarea</span></div>
       </div>
     </section>
 
@@ -331,7 +336,7 @@ footer code{font:11.5px var(--f-mono);background:var(--panel2);border:1px solid 
     </section>
   </div>
 
-  <footer><span class="keys">Atajos: <kbd>S</kbd> simular · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres David Wallace, el CFO. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
+  <footer><span class="keys">Atajos: <kbd>S</kbd> simular · <kbd>F</kbd> modo TV · <kbd>N</kbd> nombres · <kbd>M</kbd> sonido · <kbd>C</kbd> ciclo del cielo</span><br>Tú eres el CEO: tu oficina es la C1 y cada pedido sale de ahí como memo dorado. Michael es la sesión principal de Claude; los demás son subagentes en <code>~/.claude/agents</code>; los contratistas de Hooli son las tareas de Antigravity. Todo corre en local.</footer>
 </div>
 <script type="module" src="static/js/main.js"></script>
 </body>

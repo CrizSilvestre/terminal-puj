@@ -36,7 +36,7 @@ export class Sim {
     this.chars = {}; for (const [id, c] of Object.entries(CAST)) this.chars[id] = new Char(id, c.look, c.desk);
     this.contractors = []; this.paper = []; this.poiTaken = new Map(); this.selected = null; this.hover = null;
     this.catSp = buildCat(); this.cat = { x: 34, y: 120, tx: 34, ty: 120, t: 0, wait: 3, dir: 1 };
-    this.chatT = 6; this.pairT = 18; this.michaelBusy = false; this.showNames = true; this.night = 0;
+    this.chatT = 6; this.pairT = 18; this.michaelBusy = false; this.t = 0; this.ceoUntil = -1; this.showNames = true; this.night = 0;
     this.hooliSprites = HOOLI_LOOKS.map(l => buildSprites(l));
   }
 
@@ -84,6 +84,14 @@ export class Sim {
 
   // ---------- eventos ----------
   paperPlane(from, to, cb, kind = 'out') { this.paper.push({ x0: from.x, y0: from.y, x1: to.x, y1: to.y, t: 0, dur: 1.6 + Math.hypot(to.x - from.x, to.y - from.y) / 160, cb, kind }); }
+  // El CEO (tú) firma un pedido: teclea en su escritorio y el memo dorado vuela a la Torre.
+  memo() {
+    const c = this.chars.ceo; if (!c) return;
+    this.ceoUntil = this.t + 5;
+    const from = { x: c.x, y: c.y - 14 };
+    this.paperPlane(from, TOWER_PT, null, 'memo');
+  }
+  ceoBusy() { return this.t < this.ceoUntil; }
   assign(agent, delay) {
     const c = this.chars[agent]; if (!c) return;
     const to = { x: c.sitting ? c.seat.ax : c.x, y: (c.sitting ? c.seat.ay : c.y) - 14 };
@@ -124,6 +132,7 @@ export class Sim {
   think(c, dt) {
     if (c.path || c.cheerT > 0 || c.sadT > 0) return;
     if (c.id === 'michael' && this.michaelBusy) { if (!c.sitting) this.goSeat(c); return; }
+    if (c.id === 'ceo' && this.ceoBusy()) { if (!c.sitting) this.goSeat(c); return; }
     if (c.working > 0) {
       if (c.busy) this.breakPair(c);
       if (!c.sitting) this.goSeat(c);
@@ -173,7 +182,7 @@ export class Sim {
 
   // ---------- bucle ----------
   update(dt, t, env) {
-    this.night = env.n;
+    this.night = env.n; this.t = t;
     const all = [...Object.values(this.chars), ...this.contractors];
     for (const c of all) {
       if (!c.hooli) this.think(c, dt);
@@ -221,7 +230,7 @@ export class Sim {
     const sp = c.sp;
     if (c.cheerT > 0) return sp.cheer;
     if (c.sitting) {
-      const typing = c.working > 0 || (c.id === 'michael' && this.michaelBusy);
+      const typing = c.working > 0 || (c.id === 'michael' && this.michaelBusy) || (c.id === 'ceo' && this.ceoBusy());
       const f = typing ? Math.floor(c.typeT * 6) % 2 : 0;
       return c.seat.dir === 'up' ? sp.sitUp[f] : sp.sitDown[f];
     }
@@ -247,23 +256,23 @@ export class Sim {
     for (const c of all) {
       const hx = Math.round(c.x), top = c._top ?? (c.y - 20);
       // indicador de "tecleando"
-      if (c.sitting && (c.working > 0 || (c.id === 'michael' && this.michaelBusy))) {
+      if (c.sitting && (c.working > 0 || (c.id === 'michael' && this.michaelBusy) || (c.id === 'ceo' && this.ceoBusy()))) {
         const bx = hx - 5, by = top - 8;
         ctx.fillStyle = '#ffffff'; ctx.fillRect(bx, by, 11, 6); ctx.fillRect(bx + 1, by - 1, 9, 1); ctx.fillRect(bx + 1, by + 6, 9, 1); ctx.fillRect(bx + 3, by + 7, 2, 1);
         const k = Math.floor(t * 3) % 4;
-        for (let i = 0; i < 3; i++) { ctx.fillStyle = i < k ? (c.hooli ? '#e8453c' : CAST[c.id]?.wing === 'pp' ? '#2e9e5b' : '#1d3e6e') : '#c9ccd1'; ctx.fillRect(bx + 2 + i * 3, by + 2, 2, 2); }
+        for (let i = 0; i < 3; i++) { ctx.fillStyle = i < k ? (c.hooli ? '#e8453c' : c.id === 'ceo' ? '#c9a227' : CAST[c.id]?.wing === 'pp' ? '#2e9e5b' : '#1d3e6e') : '#c9ccd1'; ctx.fillRect(bx + 2 + i * 3, by + 2, 2, 2); }
       }
       // dormido: Big Head en su puf o cualquiera de noche sin tarea
-      const sleeping = c.sitting && !c.working && !c.hooli && c.id !== 'michael' && (c.id === 'bighead' || this.night > 0.85);
+      const sleeping = c.sitting && !c.working && !c.hooli && c.id !== 'michael' && c.id !== 'ceo' && (c.id === 'bighead' || this.night > 0.85);
       if (sleeping) { const k = (t * 0.6 + hx * 0.01) % 1; drawText(ctx, 'Z', hx + 4 + Math.round(k * 4), Math.round(top - 2 - k * 8), `rgba(255,255,255,${1 - k})`); }
       if (c.sadT > 0) { ctx.fillStyle = '#e8453c'; ctx.fillRect(hx - 1, top - 9, 2, 4); ctx.fillRect(hx - 1, top - 4, 2, 1); }
       if (c.cheerT > 0) { for (let i = 0; i < 5; i++) { const a = i * 1.26 + t * 3, r = 7 + (1.4 - c.cheerT) * 6; ctx.fillStyle = ['#f2c230', '#78b919', '#5fd0ea', '#e8453c', '#ffffff'][i]; ctx.fillRect(Math.round(hx + Math.cos(a) * r), Math.round(top + 6 + Math.sin(a) * r * 0.6), 1, 1); } }
       // etiqueta con el nombre
-      if (!c.hooli && (this.selected === c.id || this.hover === c.id || (this.showNames && c.working > 0))) {
+      if (!c.hooli && (this.selected === c.id || this.hover === c.id || (this.showNames && (c.working > 0 || (c.id === 'ceo' && this.ceoBusy()))))) {
         const name = nick(c.id).toUpperCase().slice(0, 9), w = textWidth(name) + 4;
-        const ly = Math.max(1, top - (c.sitting && c.working > 0 ? 17 : 9));
+        const ly = Math.max(1, top - (c.sitting && (c.working > 0 || (c.id === 'ceo' && this.ceoBusy())) ? 17 : 9));
         ctx.fillStyle = 'rgba(14,16,20,0.85)'; ctx.fillRect(hx - Math.floor(w / 2), ly, w, 7);
-        drawText(ctx, name, hx - Math.floor(w / 2) + 2, ly + 1, CAST[c.id].wing === 'pp' ? '#8ff0b5' : '#a9c8ff');
+        drawText(ctx, name, hx - Math.floor(w / 2) + 2, ly + 1, c.id === 'ceo' ? '#f2c94c' : CAST[c.id].wing === 'pp' ? '#8ff0b5' : '#a9c8ff');
       }
     }
   }
@@ -273,7 +282,7 @@ export class Sim {
       const x = p.x0 + (p.x1 - p.x0) * e, gy = p.y0 + (p.y1 - p.y0) * e, h = Math.sin(k * Math.PI) * 26, y = gy - h;
       if (phase === 'shadow') { ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fillRect(Math.round(x) - 2, Math.round(gy) + 12, 5, 1); continue; }
       const right = p.x1 >= p.x0, X = Math.round(x), Y = Math.round(y);
-      const body = p.kind === 'fail' ? '#ffd2cc' : '#ffffff';
+      const body = p.kind === 'fail' ? '#ffd2cc' : p.kind === 'memo' ? '#fff3c4' : '#ffffff';
       // estela
       for (let i = 1; i < 4; i++) { const kk = Math.max(0, k - i * 0.04), ee = kk < 0.5 ? 2 * kk * kk : 1 - Math.pow(-2 * kk + 2, 2) / 2; ctx.fillStyle = `rgba(255,255,255,${0.35 - i * 0.1})`; ctx.fillRect(Math.round(p.x0 + (p.x1 - p.x0) * ee), Math.round(p.y0 + (p.y1 - p.y0) * ee - Math.sin(kk * Math.PI) * 26), 1, 1); }
       const s = right ? 1 : -1;
@@ -281,7 +290,7 @@ export class Sim {
       for (let i = 0; i < 6; i++) ctx.fillRect(X - 3 * s + i * s, Y, 1, 1);
       for (let i = 0; i < 4; i++) ctx.fillRect(X - 3 * s + i * s, Y - 1, 1, 1);
       ctx.fillStyle = '#b8c0c8'; ctx.fillRect(X - 2 * s, Y + 1, 1, 1); ctx.fillRect(X - 1 * s, Y + 1, 1, 1);
-      ctx.fillStyle = p.kind === 'out' ? '#1d3e6e' : p.kind === 'fail' ? '#e8453c' : '#78b919'; ctx.fillRect(X, Y, 1, 1);
+      ctx.fillStyle = p.kind === 'out' ? '#1d3e6e' : p.kind === 'fail' ? '#e8453c' : p.kind === 'memo' ? '#c9a227' : '#78b919'; ctx.fillRect(X, Y, 1, 1);
     }
   }
   drawables() {
@@ -304,12 +313,12 @@ export class Sim {
   }
   headPos(id) {
     const c = this.chars[id]; if (!c) return null;
-    return { x: c.x, y: (c._top ?? c.y - 20) - (c.sitting && (c.working > 0 || (id === 'michael' && this.michaelBusy)) ? 10 : 2) };
+    return { x: c.x, y: (c._top ?? c.y - 20) - (c.sitting && (c.working > 0 || (id === 'michael' && this.michaelBusy) || (id === 'ceo' && this.ceoBusy())) ? 10 : 2) };
   }
   snapshot() {
     const out = {};
     for (const [id, c] of Object.entries(this.chars)) {
-      out[id] = c.cheerT > 0 ? 'entrega' : c.working > 0 ? 'vuelo' : (id === 'michael' && this.michaelBusy) ? 'vuelo' : c.busy ? 'charla' : c.path ? 'camina' : c.sitting ? (c.id === 'bighead' || this.night > 0.85 ? 'duerme' : 'puesto') : 'pausa';
+      out[id] = id === 'ceo' && this.ceoBusy() ? 'memo' : c.cheerT > 0 ? 'entrega' : c.working > 0 ? 'vuelo' : (id === 'michael' && this.michaelBusy) ? 'vuelo' : c.busy ? 'charla' : c.path ? 'camina' : c.sitting ? (c.id === 'bighead' || this.night > 0.85 ? 'duerme' : 'puesto') : 'pausa';
     }
     return out;
   }

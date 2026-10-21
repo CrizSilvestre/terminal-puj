@@ -1,5 +1,5 @@
 // Interfaz: pantalla de salidas (split-flap), estadísticas, radio, tripulación, ficha y burbujas.
-import { CAST, DM_IDS, PP_IDS, W, H, fmtTime, shortName, pujDayStart, nick } from './data.js';
+import { CAST, CEO_IDS, DM_IDS, PP_IDS, W, H, fmtTime, shortName, pujDayStart, nick } from './data.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -105,6 +105,7 @@ export class UI {
       grid.appendChild(el);
     };
     const head = (t, cls) => { const h = document.createElement('div'); h.className = 'crewHead ' + cls; h.textContent = t; grid.appendChild(h); };
+    head('Dirección', 'ceo'); CEO_IDS.forEach(mk);
     head('Dunder Mifflin · Operaciones', 'dm'); DM_IDS.forEach(mk);
     head('Pied Piper · Ingeniería', 'pp'); PP_IDS.forEach(mk);
     document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => {
@@ -114,7 +115,7 @@ export class UI {
     this.select('michael', false);
   }
   renderCrew(snap, flightsByAgent, all = [], now = Date.now() / 1000, status = null) {
-    const label = { vuelo: 'en vuelo', entrega: '¡aterrizó!', charla: 'en charla', camina: 'caminando', puesto: 'en tierra', duerme: 'zZz', pausa: 'en pausa' };
+    const label = { memo: 'enviando memo', vuelo: 'en vuelo', entrega: '¡aterrizó!', charla: 'en charla', camina: 'caminando', puesto: 'en tierra', duerme: 'zZz', pausa: 'en pausa' };
     document.querySelectorAll('.crew').forEach(el => {
       const st = snap[el.dataset.id] || 'puesto', chip = el.querySelector('.chip');
       if (chip.dataset.st !== st) { chip.dataset.st = st; chip.textContent = label[st]; }
@@ -125,6 +126,15 @@ export class UI {
   renderProfileStats(all, now, status) {
     const box = document.getElementById('pStats'), log = document.getElementById('pLog'); if (!box || !log) return;
     const id = this.selected;
+    if (id === 'ceo') {
+      const reqs = this.requests ? this.requests() : [], s0 = pujDayStart(now), today = all.filter(f => f.start >= s0);
+      const landed = today.filter(f => f.end && f.ok), ontime = landed.filter(f => f.end - f.start <= 900);
+      const html = `<div><b>${reqs.filter(r => r.ts >= s0).length}</b><small>pedidos hoy</small></div><div><b>${today.length}</b><small>vuelos hoy</small></div><div><b>${landed.length ? Math.round(100 * ontime.length / landed.length) + '%' : '—'}</b><small>OTP A15</small></div>`;
+      if (box.dataset.h !== html) { box.dataset.h = html; box.innerHTML = html; }
+      const lh = reqs.slice(-4).reverse().map(r => `<li><code>${esc(r.no)}</code><span>${esc(r.desc)}</span><em>${esc(fmtTime(r.ts))}</em></li>`).join('') || '<li><span style="color:var(--muted)">Aún no has firmado memos hoy.</span></li>';
+      if (log.dataset.h !== lh) { log.dataset.h = lh; log.innerHTML = lh; }
+      return;
+    }
     if (id === 'michael') {
       const reqs = this.requests ? this.requests() : [], s0 = pujDayStart(now);
       const live = all.filter(f => !f.end && now - f.start <= 1800).length, today = all.filter(f => f.start >= s0).length;
@@ -168,7 +178,7 @@ export class UI {
   }
   renderProfileStatus(st, n) {
     const el = $('#pStatus'); if (!el) return;
-    const txt = st === 'vuelo' ? `En vuelo · ${n || 1} tarea${n > 1 ? 's' : ''}` : st === 'entrega' ? 'Acaba de aterrizar' : st === 'duerme' ? 'Durmiendo en su puesto' : st === 'charla' ? 'Conversando' : st === 'camina' ? 'Caminando por la terminal' : 'En tierra, disponible';
+    const txt = st === 'memo' ? 'Firmando un memo para la Torre' : this.selected === 'ceo' && (st === 'puesto' || !st) ? 'En su oficina' : st === 'vuelo' ? `En vuelo · ${n || 1} tarea${n > 1 ? 's' : ''}` : st === 'entrega' ? 'Acaba de aterrizar' : st === 'duerme' ? 'Durmiendo en su puesto' : st === 'charla' ? 'Conversando' : st === 'camina' ? 'Caminando por la terminal' : 'En tierra, disponible';
     if (el.textContent !== txt) { el.textContent = txt; el.dataset.st = st || 'puesto'; }
   }
   // ---------- burbujas ----------

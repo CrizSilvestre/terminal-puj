@@ -109,10 +109,12 @@ function face(g, L, o, view) {
     g.px(5, 7 + o, mouth); g.px(6, 7 + o, mouth);
     if (L.beard) { g.rect(3, 7 + o, 6, 2, L.beard); g.px(3, 6 + o, L.beard); g.px(8, 6 + o, L.beard); g.rect(5, 7 + o, 2, 1, mouth); }
     g.px(3, 6 + o, L.beard || shade(S, 0.1)); // mejilla
+    if (L.goatee) { g.rect(4, 6 + o, 4, 1, L.goatee); g.rect(5, 8 + o, 2, 1, L.goatee); } // candado
   } else if (view === 'side') {
     if (L.glasses) { g.rect(3, 5 + o, 3, 1, GLASS); g.px(4, 5 + o, LENS); } else g.px(4, 5 + o, EYE);
     g.px(3, 7 + o, mouth);
     if (L.beard) { g.rect(3, 7 + o, 4, 2, L.beard); g.px(6, 6 + o, L.beard); g.px(3, 7 + o, mouth); }
+    if (L.goatee) { g.px(3, 6 + o, L.goatee); g.px(4, 6 + o, L.goatee); g.px(4, 8 + o, L.goatee); }
   }
 }
 
