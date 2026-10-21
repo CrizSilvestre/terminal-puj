@@ -1,0 +1,178 @@
+{
+  "dwight": {
+    "especialidad": "Revisor implacable de código: busca bugs, casos borde y violaciones de reglas",
+    "herramientas": "solo lectura",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Revisa el parser SSIM de AeroGate y busca fallos con vuelos que cruzan medianoche",
+      "Audita que AeroGate no tenga ninguna llamada de red nueva (debe ser 100% offline)",
+      "Busca regresiones en el módulo de rotaciones después del último refactor"
+    ],
+    "no_usar_para": "Implementar código o editar archivos; pásalo a Jim o Dinesh"
+  },
+  "jim": {
+    "especialidad": "Desarrollador pragmático que implementa features con la solución más simple que funcione",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Implementa el filtro por aerolínea en la vista de itinerarios de AeroGate",
+      "Arregla el bug de zona horaria UTC−4 en el cálculo de OTP de la tesis",
+      "Añade la columna de pernocta al export Excel del motor de horarios airside"
+    ],
+    "no_usar_para": "Revisar código ajeno ni diseñar arquitectura; pásalo a Dwight o Richard"
+  },
+  "pam": {
+    "especialidad": "Diseño de interfaces, maquetación de correos HTML Outlook-safe y textos de UI",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Maqueta el correo HTML de alertas de AeroWeather compatible con Outlook/Word",
+      "Diseña la portada y estilos del dashboard de puntualidad OTP para la tesis",
+      "Redacta el texto de bienvenida para el AIPC Planner en tono profesional y humano"
+    ],
+    "no_usar_para": "Lógica de negocio ni análisis de datos; pásalo a Jim u Oscar"
+  },
+  "oscar": {
+    "especialidad": "Análisis de datos, estadística, validación de cifras y modelos con pandas o R",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Analiza el CSV de puntualidad y calcula el OTP A15 por aerolínea para la tesis",
+      "Valida que los totales por terminal del informe AeroIntel no estén duplicados",
+      "Revisa el modelo de regresión de la tesis y detecta fugas de información"
+    ],
+    "no_usar_para": "Formato de documentos ni diseño visual; pásalo a Angela o Pam"
+  },
+  "angela": {
+    "especialidad": "Guardiana del formato: verifica normas UAPA, APA 7, ortografía y consistencia",
+    "herramientas": "solo lectura",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Revisa que el capítulo 3 de la tesis cumpla formato UAPA y APA 7 al pie",
+      "Verifica la portada, estructura y nombre de archivo del entregable de la tesis",
+      "Audita citas y referencias cruzadas: que no falte ni sobre ninguna en la tesis"
+    ],
+    "no_usar_para": "Editar el documento ni analizar datos; pásalo a Jim o a Oscar"
+  },
+  "kevin": {
+    "especialidad": "Tareas mecánicas y repetitivas: buscar, renombrar, mover, contar y listar archivos",
+    "herramientas": "lectura y edición",
+    "modelo": "haiku",
+    "ejemplos": [
+      "Lista todos los archivos .typeb en la carpeta de itinerarios de prueba de AeroGate",
+      "Cuenta cuántos vuelos hay en cada CSV de la carpeta de datos de puntualidad",
+      "Renombra los screenshots del canal GTA VI CLIP con el formato fecha-escena"
+    ],
+    "no_usar_para": "Decisiones de diseño, código delicado ni borrar cosas; pásalo a Jim"
+  },
+  "ryan": {
+    "especialidad": "Investigador web: busca herramientas, repos de GitHub, librerías y tendencias con fuentes",
+    "herramientas": "web",
+    "modelo": "sonnet",
+    "ejemplos": [
+      "Busca qué librerías open-source existen para parsear formato SSIM de aerolíneas",
+      "Investiga qué usan otros aeropuertos para calcular OTP y trae repos con fuentes",
+      "Encuentra herramientas de edición de video para Shorts de GTA VI CLIP en YouTube"
+    ],
+    "no_usar_para": "Implementar código ni instalar nada; pásalo a Jim o Gilfoyle"
+  },
+  "darryl": {
+    "especialidad": "Experto en operaciones de rampa PUJ: valida lógica SSIM, OTP, rotaciones y slots",
+    "herramientas": "solo lectura",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Valida que la lógica de pernoctas del motor airside enlace bien llegada y salida",
+      "Revisa que el parser de mensajes Type B de American aplique UTC−4 correctamente",
+      "Verifica que el cálculo OTP A15 de la tesis arrastre el retraso entre operaciones"
+    ],
+    "no_usar_para": "Escribir código ni diseñar UI; pásalo a Jim o Pam"
+  },
+  "toby": {
+    "especialidad": "Auditor de seguridad: busca secretos expuestos, datos personales y riesgos de privacidad",
+    "herramientas": "solo lectura",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Revisa que no haya API keys ni tokens en el repo público de AeroGate antes del push",
+      "Verifica que las listas BCC reales de AeroWeather no estén en el código fuente",
+      "Busca datos personales de pasajeros expuestos en los CSV de prueba del AeroIntel"
+    ],
+    "no_usar_para": "Editar ni borrar archivos; pásalo a Jim para que aplique las correcciones"
+  },
+  "richard": {
+    "especialidad": "Arquitecto: diseña la solución, parte el trabajo en pasos y señala riesgos",
+    "herramientas": "solo lectura",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Diseña la arquitectura del nuevo módulo de slots para el motor de horarios airside",
+      "Planifica cómo migrar AeroGate a una nueva estructura sin romper el modo offline",
+      "Propón los pasos para integrar METAR en AeroWeather y reparte tareas al equipo"
+    ],
+    "no_usar_para": "Implementar el código ni hacer pruebas; pásalo a Jim y Dinesh"
+  },
+  "erlich": {
+    "especialidad": "Marketing y contenido: títulos, guiones, miniaturas y estrategia de canales YouTube",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Genera 5 títulos y descripción SEO para el próximo Short de GTA VI CLIP",
+      "Escribe el guion corto en español para un episodio nuevo de Flami y Cayo",
+      "Propón el posicionamiento del CV destacando los proyectos aeroportuarios de PUJ"
+    ],
+    "no_usar_para": "Código, infraestructura ni análisis de datos; pásalo a Jim o Gilfoyle"
+  },
+  "gilfoyle": {
+    "especialidad": "Infraestructura: servidores locales, LaunchAgents, puertos, GitHub Pages y despliegues",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Configura un LaunchAgent para que AeroWeather corra automáticamente cada mañana",
+      "Despliega el dashboard de la tesis OTP en GitHub Pages con un dominio personalizado",
+      "Diagnostica por qué el servidor local del AIPC Planner no responde en el puerto 3000"
+    ],
+    "no_usar_para": "Lógica de negocio ni contenido creativo; pásalo a Jim o Erlich"
+  },
+  "dinesh": {
+    "especialidad": "Escritor y ejecutor de tests: unitarios, regresión, fixtures reales y cobertura",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Escribe tests con fixtures reales de Itinerarios Prueba para el parser de AeroGate",
+      "Reproduce el bug de vuelos duplicados con una prueba que falle y luego arréglalo",
+      "Mide la cobertura de tests del motor de horarios airside y reporta qué falta"
+    ],
+    "no_usar_para": "Arquitectura ni diseño de solución; pásalo a Richard"
+  },
+  "jared": {
+    "especialidad": "Gestión de proyecto: READMEs, manuales, changelogs, pendientes y documentación real",
+    "herramientas": "lectura y edición",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Escribe el README de AeroGate con comandos, rutas y opciones reales del proyecto",
+      "Genera el changelog de la última semana del motor de horarios airside",
+      "Haz un resumen de pendientes del AIPC Planner con las preguntas abiertas marcadas"
+    ],
+    "no_usar_para": "Código funcional ni revisiones de calidad; pásalo a Jim o Dwight"
+  },
+  "monica": {
+    "especialidad": "Estrategia y segunda opinión: evalúa viabilidad, supuestos débiles y costo real",
+    "herramientas": "solo lectura",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Evalúa si vale la pena construir AeroIntel o si ya existe algo similar en el mercado",
+      "Haz un pre-mortem del plan de monetización del canal GTA VI CLIP en YouTube",
+      "Revisa los supuestos de la metodología de la tesis OTP antes de invertir más tiempo"
+    ],
+    "no_usar_para": "Implementar ni documentar; pásalo a Jim o Jared"
+  },
+  "bighead": {
+    "especialidad": "Enlace con Antigravity: delega trabajo en volumen a agentes externos en paralelo",
+    "herramientas": "Antigravity",
+    "modelo": "inherit",
+    "ejemplos": [
+      "Documenta en paralelo los 12 módulos de AeroGate usando agentes de Antigravity",
+      "Genera las descripciones de 30 Shorts de GTA VI CLIP en lote con tier cheap",
+      "Inventaría todos los archivos de datos del proyecto de la tesis OTP en paralelo"
+    ],
+    "no_usar_para": "Tareas que requieran criterio fino o editar un solo archivo; pásalo a Jim"
+  }
+}

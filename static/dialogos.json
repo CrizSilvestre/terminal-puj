@@ -1,0 +1,501 @@
+{
+  "idle": {
+    "michael": [
+      "Desde la torre se ve todo... soy el capitán.",
+      "¿Alguien quiere café de la rampa?",
+      "Yo no gestiono vuelos, gestiono sueños.",
+      "La puntualidad es mi segundo nombre.",
+      "Un buen jefe aterriza entre su gente.",
+      "Hoy el METAR dice cielos claros, como yo.",
+      "Vamos a hacer de PUJ el mejor hub mundial.",
+      "Que nadie me hable de Toby, por favor."
+    ],
+    "dwight": [
+      "Revisé cada línea. Dos veces. Tres.",
+      "Mi granja de remolachas tiene más uptime.",
+      "Soy el asistente DEL gerente regional.",
+      "Seguridad en pista es asunto serio.",
+      "Identifiqué doce vulnerabilidades hoy.",
+      "Los débiles no sobreviven en la rampa.",
+      "Nadie conoce el SSIM como yo. Nadie.",
+      "Mis remolachas financian el sprint."
+    ],
+    "jim": [
+      "Le moví el teclado a Dwight un centímetro.",
+      "Otro día, otro itinerario por parsear.",
+      "Pam, ¿viste el atardecer en la pista?",
+      "Si el código funciona, no lo toques.",
+      "Dwight cree que el SSIM es clasificado.",
+      "¿Alguien más siente el calor de PUJ?",
+      "El truco es parecer ocupado sin sudar.",
+      "Hice un merge y me fui a la playa mental."
+    ],
+    "pam": [
+      "Estoy rediseñando las burbujas de estado.",
+      "El dashboard necesita más color caribeño.",
+      "La tipografía importa, hasta en la rampa.",
+      "Dibujé un flamenco para el ícono de carga.",
+      "La comunicación visual salva vuelos.",
+      "Hoy pinto píxeles y coordino turnos.",
+      "Un buen diseño no necesita manual.",
+      "El boletín de esta semana quedó bonito."
+    ],
+    "oscar": [
+      "En realidad, el OTP se calcula así...",
+      "Los datos no mienten, la gente sí.",
+      "Hay una correlación interesante aquí.",
+      "El margen de error es inaceptable.",
+      "Kevin, eso no es un KPI, es un snack.",
+      "Déjame verificar eso con la fuente.",
+      "La tesis necesita más rigor estadístico.",
+      "Puntualidad no es opinión, es métrica."
+    ],
+    "angela": [
+      "Este código no cumple las normas.",
+      "Mis gatos tienen más disciplina que tú.",
+      "El formato del JSON está mal. Otra vez.",
+      "No acepto commits sin documentación.",
+      "La indentación es de dos espacios. Punto.",
+      "Sprinkles aprobaría mi revisión de hoy.",
+      "Orden en la pista, orden en el código.",
+      "Nada de emojis en los mensajes de commit."
+    ],
+    "kevin": [
+      "Ojalá el chili estuviera tan listo como yo.",
+      "Los números grandes me dan hambre.",
+      "Yo muevo los datos como muevo bandejas.",
+      "¿Hay almuerzo en la sala de briefing?",
+      "Puedo contar pasajeros y calorías a la vez.",
+      "Hoy procesé mil registros. Y un sándwich.",
+      "El batch terminó antes que mi merienda.",
+      "¿Los slots se comen? Pregunto en serio."
+    ],
+    "toby": [
+      "Solo quiero que todos cumplan las normas.",
+      "Nadie leyó mi guía de privacidad...",
+      "Michael me gritó por cumplir la ley.",
+      "Archivé los consentimientos de datos.",
+      "Voy a almorzar solo, como siempre.",
+      "La auditoría no es divertida, lo sé.",
+      "¿Alguien necesita el manual de seguridad?",
+      "Hoy revisé permisos. Nadie lo notó."
+    ],
+    "ryan": [
+      "Esto debería ser un SaaS, fácil.",
+      "Estoy pivotando AeroGate a blockchain.",
+      "Mi startup va a disruptir la aviación.",
+      "¿Vieron mi pitch deck? Es fuego.",
+      "El futuro es serverless en el Caribe.",
+      "Necesitamos más IA, menos procesos.",
+      "Erlich me copió la idea, estoy seguro.",
+      "Voy a lanzar en Product Hunt mañana."
+    ],
+    "creed": [
+      "Yo llevo años aquí. O en otro sitio.",
+      "Nadie pregunta qué hago, y así me gusta.",
+      "Encontré un archivo de 1997 en el server.",
+      "Mi badge dice otra cosa, pero no importa.",
+      "¿Eso era un avión o un pájaro enorme?",
+      "Hoy vendí algo. No recuerdo qué.",
+      "Tengo acceso a cosas que no deberían ser.",
+      "La pista de noche es poesía pura."
+    ],
+    "darryl": [
+      "La rampa no se maneja desde un escritorio.",
+      "Hay que mover esos contenedores ya.",
+      "Los turnos airside son un rompecabezas.",
+      "Sin logística no hay vuelo que despegue.",
+      "Yo conozco cada rincón de la plataforma.",
+      "El calor de PUJ no frena la operación.",
+      "La carga no se queja, pero yo sí.",
+      "Un buen jefe de rampa anticipa todo."
+    ],
+    "richard": [
+      "Middle-out comprime itinerarios al máximo.",
+      "Estoy nervioso, pero el código es sólido.",
+      "La arquitectura tiene que escalar a mil.",
+      "¿Y si el parser falla en producción?",
+      "Necesito repensar el módulo de slots.",
+      "Respira, Richard... es solo un deploy.",
+      "El algoritmo es elegante, yo no tanto.",
+      "Punta Cana me pone más nervioso aún."
+    ],
+    "gilfoyle": [
+      "Anton nunca falla. Ustedes sí.",
+      "Desplegué a las tres de la mañana. De nada.",
+      "La infraestructura es arte, no oficio.",
+      "Dinesh rompió staging otra vez.",
+      "Confío más en mi servidor que en la gente.",
+      "El uptime es mi religión, literalmente.",
+      "No necesito sol, necesito SSH.",
+      "PUJ tiene buena latencia, lo admito."
+    ],
+    "dinesh": [
+      "Mis tests cubren el noventa por ciento.",
+      "Gilfoyle saboteó mi entorno, lo sé.",
+      "Escribí más tests que todos juntos.",
+      "La suite pasó verde. Tomen eso.",
+      "¿Por qué Gilfoyle tiene mejor hardware?",
+      "Estoy validando el parser de SSIM.",
+      "Nadie aprecia a los que hacen pruebas.",
+      "Si falla, no fue mi código."
+    ],
+    "jared": [
+      "¡Qué lindo equipo tenemos hoy!",
+      "Documenté cada decisión del sprint.",
+      "¿Necesitas ayuda? Estoy para servirte.",
+      "El gantt chart quedó precioso.",
+      "Todos merecen reconocimiento aquí.",
+      "Preparé el resumen para la retrospectiva.",
+      "La comunicación es la pista de despegue.",
+      "Me encanta este proyecto, de verdad."
+    ],
+    "erlich": [
+      "Mi incubadora creó el futuro de PUJ.",
+      "Las miniaturas del canal son obra mía.",
+      "Yo inventé el concepto de hub caribeño.",
+      "El branding de AeroGate necesita visión.",
+      "¿Quién quiere ver mi palapa ejecutiva?",
+      "YouTube no está listo para mi genio.",
+      "Soy el Steve Jobs de la aviación.",
+      "Flami y Cayo son propiedad intelectual."
+    ],
+    "monica": [
+      "¿Pensaron en el peor escenario posible?",
+      "Me gusta la idea, pero tiene riesgos.",
+      "La estrategia necesita un plan B.",
+      "No todo lo que brilla escala bien.",
+      "Revisé los números, hay que ajustar.",
+      "Seamos realistas antes de celebrar.",
+      "El mercado de aviación es implacable.",
+      "Pregunta incómoda: ¿y si no funciona?"
+    ],
+    "bighead": [
+      "No sé qué hice, pero el test pasó.",
+      "Creo que alguien más escribió esto.",
+      "Me ascendieron y no sé por qué.",
+      "El contratista resolvió todo, qué bien.",
+      "¿Esto es Punta Cana? Qué bonito.",
+      "Yo solo apreté un botón y funcionó.",
+      "No entendí el METAR pero dije que sí.",
+      "Tengo suerte, eso es un skill también."
+    ]
+  },
+  "trabajando": {
+    "michael": [
+      "Coordinando desde la torre, todo bajo control.",
+      "Les envié un memo motivacional a todos.",
+      "Estoy aprendiendo a leer el METAR, creo.",
+      "Supervisando la puntualidad con pasión."
+    ],
+    "dwight": [
+      "Auditoría de código línea por línea.",
+      "Comparo cada campo del itinerario SSIM.",
+      "Nadie escapa de mi revisión de seguridad.",
+      "Ejecutando protocolo de validación total."
+    ],
+    "jim": [
+      "Parseando itinerarios sin drama.",
+      "Refactorizando mientras Dwight no mira.",
+      "Conectando el módulo de slots al API.",
+      "Haciendo lo justo para que funcione bien."
+    ],
+    "pam": [
+      "Ajustando los colores del panel de vuelos.",
+      "Diseñando el layout del reporte OTP.",
+      "Preparando los assets del boletín METAR.",
+      "Puliendo la interfaz pixel por pixel."
+    ],
+    "oscar": [
+      "Analizando la varianza de puntualidad.",
+      "Correlacionando clima con retrasos.",
+      "Calculando métricas OTP del trimestre.",
+      "Validando datos contra la fuente oficial."
+    ],
+    "angela": [
+      "Revisando formato de cada documento.",
+      "Aplicando reglas de estilo al repositorio.",
+      "Verificando que todo cumpla el estándar.",
+      "Catalogando errores de indentación."
+    ],
+    "kevin": [
+      "Procesando lotes de datos, despacito.",
+      "Moviendo archivos grandes al servidor.",
+      "Contando registros... ya perdí la cuenta.",
+      "Ejecutando el script batch de siempre."
+    ],
+    "toby": [
+      "Revisando permisos de acceso a datos.",
+      "Actualizando la política de privacidad.",
+      "Documentando requisitos de cumplimiento.",
+      "Auditando logs de acceso del sistema."
+    ],
+    "ryan": [
+      "Investigando frameworks de moda.",
+      "Analizando tendencias de tráfico web.",
+      "Prototipando algo que nadie pidió.",
+      "Comparando métricas de engagement."
+    ],
+    "creed": [
+      "Haciendo... algo. Muy concentrado.",
+      "Revisando archivos que nadie recuerda.",
+      "Procesando información confidencial.",
+      "Trabajando en lo mío, como siempre."
+    ],
+    "darryl": [
+      "Coordinando posiciones en plataforma.",
+      "Optimizando turnos del personal airside.",
+      "Asignando bahías para la siguiente ola.",
+      "Cuadrando el planning de equipos de rampa."
+    ],
+    "richard": [
+      "Optimizando el algoritmo de compresión.",
+      "Reescribiendo el parser por tercera vez.",
+      "Probando la arquitectura bajo carga.",
+      "Ajustando el pipeline de procesamiento."
+    ],
+    "gilfoyle": [
+      "Configurando el deploy en Anton.",
+      "Automatizando el pipeline de staging.",
+      "Parchando la infra sin que nadie note.",
+      "Monitoreando los servicios en silencio."
+    ],
+    "dinesh": [
+      "Escribiendo tests para cada edge case.",
+      "Cubriendo el módulo de clima con pruebas.",
+      "Depurando el test que Gilfoyle rompió.",
+      "Validando respuestas del API de turnos."
+    ],
+    "jared": [
+      "Actualizando el tablero del sprint.",
+      "Redactando la documentación del release.",
+      "Organizando la retro de esta semana.",
+      "Escribiendo las notas de la reunión."
+    ],
+    "erlich": [
+      "Editando miniaturas para el canal.",
+      "Planificando el calendario de contenido.",
+      "Grabando intro para Flami y Cayo.",
+      "Diseñando la estrategia de branding."
+    ],
+    "monica": [
+      "Evaluando riesgos del nuevo módulo.",
+      "Revisando la propuesta con ojo crítico.",
+      "Comparando alternativas de arquitectura.",
+      "Analizando viabilidad del plan actual."
+    ],
+    "bighead": [
+      "Mirando la pantalla con buena actitud.",
+      "Delegando al contratista, funciona bien.",
+      "Creo que estoy haciendo algo importante.",
+      "Esperando que algo compile, creo."
+    ]
+  },
+  "entrega": {
+    "michael": [
+      "¡Aterrizaje perfecto, equipo!",
+      "Otro vuelo puntual gracias a mi liderazgo.",
+      "Eso es lo que hacemos en PUJ. Somos únicos."
+    ],
+    "dwight": [
+      "Cero errores. Como debe ser.",
+      "Revisado, aprobado y sellado por mí.",
+      "Misión cumplida. La granja estaría orgullosa."
+    ],
+    "jim": [
+      "Listo. Me voy a ver el atardecer.",
+      "Funciona en producción, vámonos.",
+      "Otro deploy sin dramas. Así me gusta."
+    ],
+    "pam": [
+      "El diseño quedó justo como lo imaginé.",
+      "¡Se ve hermoso en pantalla!",
+      "Entregado con cariño y buenos píxeles."
+    ],
+    "oscar": [
+      "Los números confirman la mejora en OTP.",
+      "Análisis entregado con fuentes verificadas.",
+      "En realidad, quedó mejor de lo esperado."
+    ],
+    "angela": [
+      "Cumple todas las normas. Finalmente.",
+      "Aprobado. No fue fácil, pero lo logré.",
+      "Formato impecable, como mis gatos."
+    ],
+    "kevin": [
+      "¡Terminé! ¿Dónde está mi almuerzo?",
+      "El batch corrió todito. Qué alegría.",
+      "Procesado completo. Hora de comer."
+    ],
+    "toby": [
+      "Cumplimos con todas las regulaciones.",
+      "Auditoría cerrada. Nadie me va a agradecer.",
+      "Todo conforme a ley. De nada, supongo."
+    ],
+    "ryan": [
+      "Esto va a ser tendencia, ya verán.",
+      "Listo para el Product Hunt del Caribe.",
+      "Publiqué el prototipo. Es disruptivo."
+    ],
+    "creed": [
+      "Entregué algo. No pregunten qué.",
+      "Listo. No hay evidencia de nada.",
+      "Cerrado. Siguiente misterio."
+    ],
+    "darryl": [
+      "Plataforma despejada y en orden.",
+      "Turnos cuadrados, equipo rotando bien.",
+      "La rampa está lista para la próxima ola."
+    ],
+    "richard": [
+      "Funciona... no puedo creerlo, funciona.",
+      "El deploy salió bien. Estoy temblando.",
+      "Middle-out lo logró otra vez."
+    ],
+    "gilfoyle": [
+      "Desplegado. Anton hizo su magia.",
+      "Producción estable. No me den las gracias.",
+      "Hecho. Voy a hablar con mi servidor."
+    ],
+    "dinesh": [
+      "Todos los tests en verde. Tomen eso.",
+      "Cobertura completa. Gilfoyle, supera eso.",
+      "Suite de pruebas pasada sin un solo fallo."
+    ],
+    "jared": [
+      "¡Documentación lista! Estoy tan feliz.",
+      "Sprint cerrado con amor y organización.",
+      "Todo documentado para la posteridad."
+    ],
+    "erlich": [
+      "El video ya tiene visitas. Soy un genio.",
+      "Publicado. El mundo no está preparado.",
+      "Contenido épico, cortesía de mi visión."
+    ],
+    "monica": [
+      "El plan funcionó. Tenía mis dudas.",
+      "Entregado con los riesgos mitigados.",
+      "Viable, validado y listo para escalar."
+    ],
+    "bighead": [
+      "¿Yo hice eso? Bueno, de nada.",
+      "El contratista entregó. Qué suerte la mía.",
+      "Listo. Ni yo sé cómo pasó."
+    ]
+  },
+  "pares": [
+    {
+      "a": "dwight",
+      "b": "jim",
+      "lineas": [
+        ["dwight", "Toqué tu código. Tenía once fallos."],
+        ["jim", "Eran comentarios, Dwight."],
+        ["dwight", "Un comentario sin propósito es un fallo."],
+        ["jim", "Voy a comentar tu remolacha entonces."]
+      ]
+    },
+    {
+      "a": "jim",
+      "b": "pam",
+      "lineas": [
+        ["jim", "Pam, mira la pista desde aquí."],
+        ["pam", "Parece una pintura al atardecer."],
+        ["jim", "Como tu dashboard, pero más grande."]
+      ]
+    },
+    {
+      "a": "gilfoyle",
+      "b": "dinesh",
+      "lineas": [
+        ["dinesh", "Mi test suite tiene cien por ciento."],
+        ["gilfoyle", "Cien por ciento de inutilidad, tal vez."],
+        ["dinesh", "Anton no podría correr mis tests."],
+        ["gilfoyle", "Anton no corre basura, correcto."]
+      ]
+    },
+    {
+      "a": "erlich",
+      "b": "jared",
+      "lineas": [
+        ["erlich", "Jared, mi canal necesita más épica."],
+        ["jared", "Preparé un plan editorial muy bonito."],
+        ["erlich", "¿Tiene mi cara en la miniatura?"],
+        ["jared", "Tiene... la marca del equipo."]
+      ]
+    },
+    {
+      "a": "michael",
+      "b": "toby",
+      "lineas": [
+        ["michael", "Toby, ¿por qué sigues aquí?"],
+        ["toby", "Porque la ley de datos lo exige."],
+        ["michael", "La ley debería exigir que te vayas."]
+      ]
+    },
+    {
+      "a": "richard",
+      "b": "monica",
+      "lineas": [
+        ["richard", "El parser escala, te lo prometo."],
+        ["monica", "¿Y si llegan mil itinerarios a la vez?"],
+        ["richard", "Bueno... middle-out resiste... creo."],
+        ["monica", "Necesito datos, no esperanzas."]
+      ]
+    },
+    {
+      "a": "kevin",
+      "b": "oscar",
+      "lineas": [
+        ["kevin", "Oscar, ¿un KPI puede ser un postre?"],
+        ["oscar", "En realidad, no. Absolutamente no."],
+        ["kevin", "Pero mide mi felicidad operativa."]
+      ]
+    },
+    {
+      "a": "angela",
+      "b": "oscar",
+      "lineas": [
+        ["angela", "Oscar, tu reporte no tiene formato."],
+        ["oscar", "Tiene datos precisos, que es mejor."],
+        ["angela", "Sin formato, mis gatos lo rechazan."]
+      ]
+    },
+    {
+      "a": "darryl",
+      "b": "gilfoyle",
+      "lineas": [
+        ["darryl", "Necesito el sistema de turnos ya."],
+        ["gilfoyle", "Anton lo despliega cuando yo diga."],
+        ["darryl", "Dile a Anton que la rampa no espera."]
+      ]
+    },
+    {
+      "a": "bighead",
+      "b": "richard",
+      "lineas": [
+        ["bighead", "Richard, ¿esto lo hice yo?"],
+        ["richard", "No... lo hizo tu contratista."],
+        ["bighead", "Igual cuenta, ¿no?"]
+      ]
+    },
+    {
+      "a": "ryan",
+      "b": "erlich",
+      "lineas": [
+        ["ryan", "Mi startup de aviación va a explotar."],
+        ["erlich", "Yo ya exploté tres. Bienvenido."],
+        ["ryan", "La mía es diferente, es disruptiva."],
+        ["erlich", "Eso dije yo cada vez, hermano."]
+      ]
+    },
+    {
+      "a": "creed",
+      "b": "jared",
+      "lineas": [
+        ["creed", "Jared, ¿tú sabes qué hago aquí?"],
+        ["jared", "Eres parte vital del equipo, Creed."],
+        ["creed", "Buena respuesta. Yo tampoco sé."]
+      ]
+    }
+  ]
+}

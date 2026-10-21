@@ -1,0 +1,52 @@
+{
+  "pedido": [
+    "Torre: {vuelo}, recibido. Mantenga posición, verificando destino {destino}.",
+    "{vuelo}: Torre Punta Cana, solicitamos plan de vuelo a {destino}. {desc}.",
+    "Torre: {vuelo}, copiado su solicitud. {desc}. Espere instrucciones.",
+    "{vuelo}: Torre, listos en plataforma. Destino {destino}, aguardamos.",
+    "Torre: {vuelo}, confirme intenciones. Tenemos su pedido a {destino}."
+  ],
+  "asignado": [
+    "Torre: {vuelo}, autorizado a rodar rumbo {destino}. {agente} al mando.",
+    "Torre: {vuelo}, ingrese a la pista. {agente} asignado. {desc}.",
+    "Torre: {vuelo}, {agente} tiene la frecuencia. Ruede a posición.",
+    "{vuelo}: Copiado torre, {agente} rodando hacia {destino}. {desc}.",
+    "Torre: {vuelo}, vientos calmados. {agente}, autorizado a rodar.",
+    "Torre: {vuelo}, notifique listo. {agente} coordinará rumbo {destino}."
+  ],
+  "despegue": [
+    "Torre: {vuelo}, autorizado a despegar rumbo {destino}. {desc}.",
+    "{vuelo}: Despegando, {agente} en control. Rumbo {destino}, corto.",
+    "Torre: {vuelo}, libre de pista. {agente}, buen vuelo a {destino}.",
+    "{vuelo}: En el aire, torre. {agente} operando. {desc}.",
+    "Torre: {vuelo}, ascenso aprobado. {agente} en ruta hacia {destino}."
+  ],
+  "demorado": [
+    "Torre: {vuelo}, lleva {min} min en vuelo. Reporte condiciones.",
+    "{vuelo}: Torre, {agente} reporta turbulencia. {min} min en ruta.",
+    "Torre: {vuelo}, {min} min sin novedades. {agente}, notifique estado.",
+    "{vuelo}: Seguimos en ruta, torre. {agente} operando, {min} min.",
+    "Torre: {vuelo}, tráfico demorado {min} min. {agente}, mantenga rumbo."
+  ],
+  "aterrizado": [
+    "Torre: {vuelo}, aterrizado. Bienvenido a {destino}. Excelente vuelo.",
+    "{vuelo}: En tierra, torre. {agente} reporta misión cumplida. {desc}.",
+    "Torre: {vuelo}, libre de pista. {agente} completó rumbo {destino}.",
+    "{vuelo}: Torre, rodamos a plataforma. {agente} cierra plan de vuelo.",
+    "Torre: {vuelo}, confirmamos aterrizaje. {destino} alcanzado. Buen trabajo.",
+    "{vuelo}: Pista libre, torre. {agente} en {destino}. Todo nominal."
+  ],
+  "cancelado": [
+    "Torre: {vuelo}, cancele aproximación. {agente}, regrese a base.",
+    "{vuelo}: Abortamos, torre. {agente} reporta fallo. {desc}.",
+    "Torre: {vuelo}, plan cancelado rumbo {destino}. Espere en tierra.",
+    "{vuelo}: Mayday torre, {agente} no pudo completar. {desc}.",
+    "Torre: {vuelo}, retorne a plataforma. {destino} no alcanzado."
+  ],
+  "fin": [
+    "Torre: {vuelo}, cierre frecuencia. Operación {destino} finalizada.",
+    "Torre: {vuelo}, cambio y fuera. {agente} libre de servicio.",
+    "{vuelo}: Gracias torre, {agente} cierra comunicación. Hasta pronto.",
+    "Torre: {vuelo}, fin de transmisión. Buen descanso, {agente}."
+  ]
+}
