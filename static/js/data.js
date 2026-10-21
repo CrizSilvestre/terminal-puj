@@ -9,7 +9,7 @@ export const CAST = {
   ceo: { name: 'Criz Silvestre', wing: 'ceo', gate: 'C1', role: 'CEO · Dirección general',
     blurb: 'Tú. Las órdenes salen de esta oficina: cada pedido viaja como memo dorado a la Torre, donde Michael lo reparte.',
     use: 'Escríbele a Claude en el chat: tu avatar firma el memo y lo envía a la Torre.', model: '—', access: 'todo',
-    look: { skin: '#f1cfb2', hair: '#151210', style: 'short', shirt: '#f4f4f4', jacket: '#1f2430', tie: '#c9a227', pants: '#1f2430', glasses: true, goatee: '#4a3a30' },
+    look: { skin: '#f1cfb2', hair: '#151210', style: 'short', shirt: '#f4f4f4', jacket: '#1f2430', tie: '#c9a227', pants: '#1f2430' },
     desk: { x: 128, y: 124, w: 34, dir: 'down', kind: 'exec', deco: 'ceo' } },
   // ======== DUNDER MIFFLIN ========
   michael: { name: 'Michael Scott', wing: 'dm', gate: 'T1', role: 'Regional Manager · Torre de control',

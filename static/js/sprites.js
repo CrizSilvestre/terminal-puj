@@ -104,7 +104,12 @@ function head(g, L, o, view) {
 function face(g, L, o, view) {
   const S = L.skin, mouth = shade(S, -0.32);
   if (view === 'front') {
-    if (L.glasses) { // monturas finas: aro arriba, ojos visibles dentro, puente fino
+    if (L.glasses && L.glassStyle) {
+      const st = L.glassStyle, y = 5 + o;
+      if (st === 'thin') { g.px(5, y, '#6a6a6a'); g.px(6, y, '#6a6a6a'); g.px(3, y, '#cfe3ea'); g.px(8, y, '#cfe3ea'); g.px(4, y, EYE); g.px(7, y, EYE); }
+      else if (st === 'aviator') { const Gd = '#c9a227'; g.px(3, y, Gd); g.px(5, y, Gd); g.px(6, y, Gd); g.px(8, y, Gd); g.px(4, y, '#2f4a5c'); g.px(7, y, '#2f4a5c'); g.px(4, y + 1, '#5d7d8f'); g.px(7, y + 1, '#5d7d8f'); }
+      else if (st === 'rimless') { g.px(4, y, EYE); g.px(7, y, EYE); g.px(5, y, '#b9b9b9'); g.px(6, y, '#b9b9b9'); g.px(3, y, '#e6f2f6'); g.px(8, y, '#e6f2f6'); g.px(4, y - 1, '#e6f2f6'); g.px(7, y - 1, '#e6f2f6'); }
+    } else if (L.glasses) { // monturas finas: aro arriba, ojos visibles dentro, puente fino
       const F = '#4a4a4a', T = '#dceef5';
       g.px(3, 4 + o, F); g.px(4, 4 + o, F); g.px(7, 4 + o, F); g.px(8, 4 + o, F);
       g.px(3, 5 + o, T); g.px(4, 5 + o, EYE); g.px(5, 5 + o, F); g.px(6, 5 + o, F); g.px(7, 5 + o, EYE); g.px(8, 5 + o, T);
